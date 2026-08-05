@@ -70,6 +70,17 @@ this ADR's whole point is $0/month. This is a real, visible demo
 limitation, not silently accepted: `docs/DEPLOYMENT.md`'s smoke-test
 checklist and cost section both flag it.
 
+### `preDeployCommand` doesn't exist on free-tier services
+
+Discovered from a real Blueprint sync attempt, not docs: Render rejects
+the whole Blueprint if a free-tier service sets `preDeployCommand`
+("pre-deploy command is not supported for free tier services"). ADR-0015's
+original design ran `bin/rails db:prepare && bin/rails db:seed` there.
+Moved into `bin/render-web-with-sidekiq` itself instead, run on every
+container boot rather than only on deploy — safe, since both are
+idempotent (migrations no-op when already applied; every seed file
+skips already-present rows).
+
 ### render.yaml also had three real schema bugs, fixed in the same pass
 
 While rebuilding the service list, `render.yaml` was validated
@@ -96,6 +107,46 @@ real, independent validation failures:
 All three were real causes of Render's opaque "Blueprint file was found,
 but there was an issue" sync failure, not hypothetical — the file now
 validates cleanly against the real schema.
+
+### Two real, previously-undiscovered bugs found by actually booting the merged process
+
+Neither of these is specific to the free-tier redesign — both were latent
+bugs that this ADR's direct end-to-end testing (build the production
+image, run it against real Postgres/Redis, watch it boot) happened to be
+the first thing in this project's history to actually exercise. Neither
+would have been caught by the test suite (which stubs/mocks around both)
+or by ADR-0015's original preparation (which never ran a real Blueprint
+sync or a live Sidekiq server).
+
+1. **`KnowledgeChunkingJob` had no rescue for `Gateway::AllProvidersFailed`**,
+   unlike every other AI task in `app/domain/ai` (`brief.rb`, `triage.rb`,
+   `assistant.rb`, etc. all rescue it for graceful degradation). Seeding
+   the knowledge base calls this job inline and synchronously
+   (`db/seeds/knowledge_base.rb`), so on a fresh database with no AI
+   provider configured — this deployment's deliberate default,
+   `docs/DEPLOYMENT.md` section 8 — `db:prepare`'s automatic first-run
+   seed would hard-crash the whole boot. Fixed in
+   `app/jobs/knowledge_chunking_job.rb`: same rescue pattern as
+   everywhere else, doc stays approved but un-embedded, a warning is
+   logged. Covered by a new spec case.
+2. **Sidekiq 7.3.9's scheduler thread crashes on boot** against
+   `connection_pool` 3.0.2 — `Sidekiq::Scheduled::Poller#initial_wait`
+   calls `@sleeper.pop(total)` with a positional argument, but
+   `connection_pool` 3.0 made `TimedStack#pop`'s timeout keyword-only.
+   This means `schedule.yml`'s cron jobs (missed-checkin scan, SLA watch,
+   reminders, weekly digest, AI watch expiry — all of it) would never
+   have fired in any real deployment of this app, free-tier or not. This
+   went undetected because `ops/docker-compose.yml` has no `sidekiq`
+   service — dev has only ever exercised jobs via direct `.perform`
+   calls in specs/seeds, never a live `bundle exec sidekiq` server, until
+   this ADR's testing ran one for the first time. Fixed by bumping
+   `sidekiq` 7.3.9 -> 7.3.10 (`bundle update sidekiq connection_pool`,
+   `backend/Gemfile.lock`) — 7.3.10 itself constrains its `connection_pool`
+   dependency to `< 3`, which is the real fix (not a version this project
+   chose arbitrarily). Verified directly: rebuilt the image, re-ran it,
+   confirmed `SlaWatchJob`/`DailyReminderJob`/`DoseReminderJob`/etc. all
+   fired via the scheduler, and shutdown logged a clean "Scheduler
+   exiting..." instead of crashing.
 
 ## Consequences
 

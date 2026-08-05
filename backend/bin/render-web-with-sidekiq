@@ -7,6 +7,15 @@
 # async jobs) has to share the one free web service instead of running as
 # its own paid `nachcare-sidekiq` worker.
 #
+# `preDeployCommand` also isn't supported on free-tier services (Render
+# rejects the whole Blueprint if it's set), so db:prepare/db:seed run
+# here instead, on every boot rather than only on deploy. Both are
+# idempotent (db:seed's seed files all skip already-present data), so
+# this is safe on the frequent cold-starts a free, spin-down-after-idle
+# service goes through — see ADR-0016.
+bin/rails db:prepare
+bin/rails db:seed
+
 # Both children are started in the background so this script's own PID 1
 # can trap and forward SIGTERM/SIGINT to both on container stop/redeploy —
 # `bin/rails server & exec ...` would leave Sidekiq unable to receive the

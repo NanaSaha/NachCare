@@ -112,15 +112,15 @@ services:
     dockerContext: ./backend
     dockerCommand: ./bin/render-web-with-sidekiq
     healthCheckPath: /up
-    # db:prepare: applies pending migrations, or creates+migrates a fresh
-    # DB on the very first deploy (idempotent either way). db:seed loads
-    # db/seeds.rb (drugs, ruleset, knowledge base, learn content) — all
-    # four seed files are idempotent (skip if already present), safe to
-    # run on every deploy. This deliberately does NOT run
-    # db/seeds/ingrid_scenario.rb (full Ingrid/Sabine demo story incl. a
-    # nurse login with a fixed, publicly-known password) — that stays a
-    # manual, explicit post-deploy step. See docs/DEPLOYMENT.md.
-    preDeployCommand: "bin/rails db:prepare && bin/rails db:seed"
+    # `preDeployCommand` isn't supported on free-tier services (Render
+    # rejects the whole Blueprint sync if it's set) — db:prepare/db:seed
+    # (applies migrations; loads the drug list / escalation ruleset /
+    # knowledge base / Learn content, all idempotent) run inside
+    # bin/render-web-with-sidekiq instead, on every boot. This
+    # deliberately does NOT run db/seeds/ingrid_scenario.rb (full
+    # Ingrid/Sabine demo story incl. a nurse login with a fixed,
+    # publicly-known password) — that stays a manual, explicit post-deploy
+    # step. See docs/DEPLOYMENT.md.
     # No `disk:` — free web services can't have one (Render docs). Active
     # Storage's `local` service still writes to storage/ inside the
     # container, but that path is now ephemeral: it's wiped on every

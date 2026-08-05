@@ -100,17 +100,16 @@ UI version). Render will:
 1. Create the Postgres database and Key Value instance first.
 2. Build `nachcare-backend`'s Docker image from
    `backend/Dockerfile.production`.
-3. Run `nachcare-backend`'s `preDeployCommand`
-   (`bin/rails db:prepare && bin/rails db:seed`) — creates the schema and
-   loads the drug list / escalation ruleset / knowledge base / Learn
-   content (all idempotent, safe to run again on every future deploy).
-4. Build both static sites (`npm ci && npx ng build <project>
+3. Build both static sites (`npm ci && npx ng build <project>
    --configuration production` in `frontend/`).
-5. Start `nachcare-backend` via `bin/render-web-with-sidekiq`, which runs
-   Puma and Sidekiq (loads `config/schedule.yml`'s cron jobs on boot) as
-   two processes inside the one container — see
-   `docs/adr/0016-free-tier-render-deployment.md` for why they're merged
-   instead of separate services.
+4. Start `nachcare-backend` via `bin/render-web-with-sidekiq`, which runs
+   `bin/rails db:prepare && bin/rails db:seed` (creates the schema and
+   loads the drug list / escalation ruleset / knowledge base / Learn
+   content — all idempotent, safe to run on every boot) and then starts
+   Puma and Sidekiq (loads `config/schedule.yml`'s cron jobs) as two
+   processes inside the one container. This runs at boot rather than as
+   a `preDeployCommand` because free-tier services don't support that
+   field at all — see `docs/adr/0016-free-tier-render-deployment.md`.
 
 First deploy will likely take several minutes (the Docker image build is
 the slow part). Watch the service's **Logs** tab in the Render dashboard.
@@ -124,10 +123,10 @@ one that sits idle for hours will have a slow first request and may have
 missed a scheduled job tick in the meantime. See ADR-0016 if this becomes
 a real problem — the fix is reverting to a separate paid Sidekiq worker.
 
-**Known gap in this step, unverified:** whether `preDeployCommand` behaves
-exactly as documented for `runtime: docker` services was not something
-this preparation work could test without a real account — if the backend
-service fails to come up, check its logs for a migration error first.
+If the backend service fails to come up, check its logs for a migration
+or seed error first — `bin/render-web-with-sidekiq` runs `db:prepare`/
+`db:seed` before starting Puma, so a real error there will show up as
+the service never becoming healthy.
 
 ## 5. One-time step: enable the `pgvector` Postgres extension
 
@@ -323,9 +322,10 @@ otherwise).
 ## 10. Redeploying after future code changes
 
 Render auto-deploys on every push to `main` by default (configurable per
-service in the dashboard under **Settings -> Auto-Deploy**). Each deploy
-re-runs `nachcare-backend`'s `preDeployCommand`
-(`db:prepare && db:seed`), which is safe/idempotent.
+service in the dashboard under **Settings -> Auto-Deploy**). Each restart
+of `nachcare-backend` (deploy, or a free-tier spin-down/wake cycle) reruns
+`db:prepare`/`db:seed` via `bin/render-web-with-sidekiq`, which is
+safe/idempotent.
 
 ---
 
@@ -361,10 +361,20 @@ re-runs `nachcare-backend`'s `preDeployCommand`
 - `bin/render-web-with-sidekiq` (the script that runs Puma + Sidekiq in
   one container for the free-tier deploy, ADR-0016) was built into the
   production image and run against the real dev Postgres/Redis
-  containers: both processes came up (confirmed via the boot logs and a
-  `/up` health check), and `docker stop` shut both down cleanly within
-  its grace period — no force-kill needed, confirming the SIGTERM
-  trap/forward logic actually works, not just reads correctly.
+  containers, including a full first-boot simulation against a completely
+  fresh, empty database (`db:prepare`/`db:seed` from scratch, since
+  `preDeployCommand` isn't usable on free tier — see ADR-0016). This
+  caught and fixed two real bugs that had never been exercised before
+  (neither is free-tier-specific, both would have hit any real
+  deployment): `KnowledgeChunkingJob` crashing the whole seed run when no
+  AI provider is configured, and Sidekiq's scheduler thread crashing on
+  boot against an incompatible `connection_pool` version — this project
+  had never actually run a live `bundle exec sidekiq` server before this
+  testing (`ops/docker-compose.yml` has no `sidekiq` service). After both
+  fixes: both processes come up cleanly (confirmed via boot logs and a
+  `/up` health check), `schedule.yml`'s cron jobs actually fire
+  (confirmed in the logs, not just "added"), and `docker stop` shuts both
+  down cleanly within its grace period — no force-kill needed.
 
 **Not verified — genuinely requires a real Render account, out of scope
 for this preparation work:**
@@ -373,8 +383,6 @@ for this preparation work:**
   infrastructure.
 - Whether `fromDatabase`/`fromService` env var wiring resolves exactly as
   documented.
-- Whether `preDeployCommand` behaves as documented for `runtime: docker`
-  services specifically.
 - Whether `CREATE EXTENSION vector;` succeeds on a real Render Postgres
   instance (Render's docs say pgvector is supported; this wasn't tested
   against a live instance).
