@@ -212,6 +212,8 @@ GEM
     nio4r (2.7.5)
     nokogiri (1.19.4-aarch64-linux-gnu)
       racc (~> 1.4)
+    nokogiri (1.19.4-x86_64-linux-gnu)
+      racc (~> 1.4)
     orm_adapter (0.5.0)
     parallel (2.1.0)
     parser (3.3.12.0)
@@ -219,6 +221,7 @@ GEM
       racc
     pdf-core (0.10.0)
     pg (1.6.3-aarch64-linux)
+    pg (1.6.3-x86_64-linux)
     pgvector (0.3.3)
     pp (0.6.4)
       prettyprint
@@ -408,6 +411,8 @@ GEM
 
 PLATFORMS
   aarch64-linux-gnu
+  x86_64-linux
+  x86_64-linux-gnu
 
 DEPENDENCIES
   aws-sdk-bedrockruntime (~> 1.0)
