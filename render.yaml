@@ -120,9 +120,14 @@ services:
       # below doesn't need one (Render disks are single-service anyway).
       mountPath: /app/storage
       sizeGB: 1
-    envVarGroups:
-      - nachcare-shared
+    # A service has no `envVarGroups` field in Render's Blueprint schema
+    # (checked against render.com/schema/render.yaml.json —
+    # `serverService` is `additionalProperties: false` and doesn't list
+    # it) — an earlier revision of this file used that key directly and
+    # would have failed Blueprint validation. Groups are pulled in via a
+    # `fromGroup` entry inside `envVars` instead.
     envVars:
+      - fromGroup: nachcare-shared
       - key: DATABASE_URL
         fromDatabase:
           name: nachcare-db
@@ -152,9 +157,8 @@ services:
     # sidekiq-cron loads config/schedule.yml at boot
     # (config/initializers/sidekiq.rb, Sidekiq.configure_server block) —
     # no separate wiring needed, confirmed by reading that initializer.
-    envVarGroups:
-      - nachcare-shared
     envVars:
+      - fromGroup: nachcare-shared
       - key: DATABASE_URL
         fromDatabase:
           name: nachcare-db
@@ -175,11 +179,14 @@ services:
       paths:
         - frontend/**
         - render.yaml
+    # `header` entries are flat {path, name, value} objects in Render's
+    # schema, not {path, headers: [{key, value}]} — an earlier revision
+    # used the wrong nested shape, which would fail Blueprint validation
+    # (checked against render.com/schema/render.yaml.json's `header` def).
     headers:
       - path: /sw.js
-        headers:
-          - key: Cache-Control
-            value: no-cache
+        name: Cache-Control
+        value: no-cache
     routes:
       - type: rewrite
         source: /*
@@ -210,14 +217,16 @@ services:
     plan: free
     region: frankfurt
     maxmemoryPolicy: noeviction # Sidekiq job data must not be evicted under memory pressure
-    # `ipAllowList` intentionally omitted rather than set to `[]` — Render's
-    # Blueprint schema documents this as a required field expecting
-    # CIDR-shaped entries (`source`/`description`), and calls an empty
-    # array "not recommended" (fetched from render.com/docs/blueprint-spec
-    # while debugging a "Blueprint file was found, but there was an issue"
-    # sync failure). Omitting it lets Render apply its own default
-    # (same-region private-network-only access), which is the same intent
-    # the `[]` was going for, just expressed the way the schema expects.
+    # `ipAllowList` is a REQUIRED field on Key Value services (confirmed
+    # against render.com/docs/blueprint-spec and Render's own
+    # render-oss/skills examples) — Blueprint sync fails if it's omitted.
+    # An earlier revision of this file mistakenly removed it entirely
+    # (misdiagnosed the schema error); `[]` is in fact the documented,
+    # recommended value for "no public internet access, same-region
+    # private network only" — exactly the access pattern the backend and
+    # sidekiq services need (they reach this over Render's private network,
+    # not the public internet).
+    ipAllowList: []
 
 databases:
   - name: nachcare-db
