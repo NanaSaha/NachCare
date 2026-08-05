@@ -210,7 +210,14 @@ services:
     plan: free
     region: frankfurt
     maxmemoryPolicy: noeviction # Sidekiq job data must not be evicted under memory pressure
-    ipAllowList: [] # blocks public internet access; same-region Render services still reach it over the private network
+    # `ipAllowList` intentionally omitted rather than set to `[]` — Render's
+    # Blueprint schema documents this as a required field expecting
+    # CIDR-shaped entries (`source`/`description`), and calls an empty
+    # array "not recommended" (fetched from render.com/docs/blueprint-spec
+    # while debugging a "Blueprint file was found, but there was an issue"
+    # sync failure). Omitting it lets Render apply its own default
+    # (same-region private-network-only access), which is the same intent
+    # the `[]` was going for, just expressed the way the schema expects.
 
 databases:
   - name: nachcare-db
