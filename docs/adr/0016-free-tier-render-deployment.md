@@ -112,6 +112,33 @@ normal case succeeds on attempt 1/40 with no added delay; a
 deliberately unreachable host doesn't crash the script (confirmed it
 enters the retry path rather than exiting immediately).
 
+**This retry loop turned out to be treating a symptom, not the actual
+cause.** The real deploy kept failing identically across 40+ attempts
+spanning several minutes — not a transient startup race at all. The
+product owner checked Render's dashboard directly (`nachcare-db`'s
+Connect tab, then `nachcare-backend`'s Environment tab) and confirmed
+Render's injected `DATABASE_URL` was correct all along
+(`postgresql://nachcare:...@dpg-xxxx-a/nachcare_production`, no
+explicit port — meaning "use the real default," 5432). The actual bug
+was in this codebase: `backend/config/database.yml`'s `default` anchor
+had `port: <%= ENV.fetch("POSTGRES_PORT", 5433) %>` — 5433 was never a
+real Postgres port, it's `ops/docker-compose.yml`'s host-side-only port
+mapping (`"5433:5432"`, chosen because "5432 is taken by another
+project's container on this host" per that file's own comment) that had
+leaked into a checked-in fallback default. Dev never noticed because
+`ops/docker-compose.yml`'s `backend` service always sets
+`POSTGRES_PORT=5432` explicitly for container-to-container traffic; the
+5433 fallback only ever mattered for host-machine-side, non-Docker
+access. Production never sets `POSTGRES_PORT` at all, so it silently
+inherited this one contributor's local-machine workaround as its real
+connection port. Fixed by changing the fallback to 5432 (the actual
+default). Verified directly: reproduced the exact bug locally with a
+port-less `DATABASE_URL` (matching Render's shape) against the
+unfixed file (fails, same symptom), then against the fixed file
+(`db:prepare succeeded (attempt 1/40)`); also confirmed via
+`ActiveRecord::Base.connection_db_config.configuration_hash` that the
+resolved production config now shows `port: 5432`.
+
 ### render.yaml also had three real schema bugs, fixed in the same pass
 
 While rebuilding the service list, `render.yaml` was validated
