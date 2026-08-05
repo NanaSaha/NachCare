@@ -14,27 +14,34 @@
 # this is safe on the frequent cold-starts a free, spin-down-after-idle
 # service goes through — see ADR-0016.
 #
-# Render doesn't guarantee nachcare-db is actually accepting connections
-# by the time this container's first boot reaches this line (observed
-# directly on a real first deploy: PG::ConnectionBad "Connection
-# refused" against the private-network host/port from DATABASE_URL,
-# not a DNS/config problem — the database just hadn't finished starting
-# yet). pg_isready polls until it's actually ready instead of assuming
-# Render's dependency ordering covers this.
-echo "Waiting for database to accept connections..."
-for i in $(seq 1 30); do
-  if pg_isready -d "$DATABASE_URL" -q; then
-    echo "Database is ready."
+# Render doesn't guarantee nachcare-db is actually accepting real
+# sessions by the time this container's first boot reaches this line.
+# An earlier version of this script gated on `pg_isready` first, but a
+# real first deploy showed that's not a sufficient proxy: pg_isready
+# reported ready almost instantly, then the very next real connection
+# Rails opened still got PG::ConnectionBad "Connection refused" against
+# the exact same host/port — twice, on two separate container restarts.
+# A fresh Postgres instance's short-lived internal restarts/bootstrap
+# steps evidently produced connection-accepting windows too narrow (or
+# too intermittent) for a plain liveness probe to reliably catch. So
+# this retries the real operation — db:prepare itself — instead of a
+# lighter proxy for it. `if` conditions are exempt from this script's
+# `set -e`, so a failing db:prepare here doesn't abort the script.
+echo "Waiting for database and running db:prepare..."
+max_attempts=40
+for i in $(seq 1 $max_attempts); do
+  if bin/rails db:prepare; then
+    echo "db:prepare succeeded (attempt $i/$max_attempts)."
     break
   fi
-  if [ "$i" -eq 30 ]; then
-    echo "Database never became ready after 30 attempts (~2.5 minutes) — giving up." >&2
+  if [ "$i" -eq "$max_attempts" ]; then
+    echo "db:prepare never succeeded after $max_attempts attempts (~10 minutes) — giving up." >&2
     exit 1
   fi
-  sleep 5
+  echo "db:prepare failed (attempt $i/$max_attempts), retrying in 15s..."
+  sleep 15
 done
 
-bin/rails db:prepare
 bin/rails db:seed
 
 # Both children are started in the background so this script's own PID 1

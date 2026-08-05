@@ -85,19 +85,32 @@ skips already-present rows).
 
 Also discovered from a real deploy, not something testable without one:
 the very first real Blueprint sync had `nachcare-backend` boot and hit
-`db:prepare` before `nachcare-db` was actually accepting connections yet
-(`PG::ConnectionBad: connection to server at "<private-ip>", port 5433
-failed: Connection refused` — a real private-network host that just
-wasn't listening yet, not a config/DNS problem). Render doesn't
-guarantee a service's dependencies have finished starting before it
-boots. Fixed by polling with `pg_isready -d "$DATABASE_URL"` (up to 30
-attempts, 5s apart, ~2.5 minutes total) before running `db:prepare`, so
-this is a wait, not a retry-forever hope — if the database genuinely
-never comes up, the container exits with a clear log line instead of a
-raw `PG::ConnectionBad` trace. Verified directly: build under normal
-conditions ("Database is ready." within the same second, no added
-delay); build against a deliberately unreachable host (confirmed it
-polls instead of crashing on the first attempt).
+`db:prepare` before `nachcare-db` was actually accepting real sessions
+yet (`PG::ConnectionBad: connection to server at "<private-ip>", port
+5433 failed: Connection refused`). Render doesn't guarantee a service's
+dependencies have finished starting before it boots.
+
+First fix attempt gated on `pg_isready -d "$DATABASE_URL"` before
+`db:prepare` — reasonable in theory, but a second real deploy showed
+it's not a sufficient proxy here: `pg_isready` reported ready almost
+instantly, then the very next real connection Rails opened still got
+the identical `Connection refused` against the same host/port — on two
+separate container restarts in a row. Whatever a freshly-created
+Postgres instance is doing internally during its first minute or so
+(short-lived internal restarts as part of provisioning, most likely)
+produced connection-accepting windows either too narrow or too
+intermittent for a lightweight liveness probe to reliably catch.
+
+Replaced with retrying the real operation instead of a proxy for it:
+`bin/render-web-with-sidekiq` now retries `bin/rails db:prepare` itself
+directly (up to 40 attempts, 15s apart, ~10 minutes total budget) —
+safe because `db:prepare` is idempotent and a `PG::ConnectionBad`
+happens before any query executes, so a failed attempt can't leave
+partial state. If the database genuinely never comes up, the container
+exits with a clear log line instead of a raw trace. Verified directly:
+normal case succeeds on attempt 1/40 with no added delay; a
+deliberately unreachable host doesn't crash the script (confirmed it
+enters the retry path rather than exiting immediately).
 
 ### render.yaml also had three real schema bugs, fixed in the same pass
 
