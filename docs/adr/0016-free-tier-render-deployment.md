@@ -81,6 +81,24 @@ container boot rather than only on deploy — safe, since both are
 idempotent (migrations no-op when already applied; every seed file
 skips already-present rows).
 
+### Database not guaranteed ready on first boot
+
+Also discovered from a real deploy, not something testable without one:
+the very first real Blueprint sync had `nachcare-backend` boot and hit
+`db:prepare` before `nachcare-db` was actually accepting connections yet
+(`PG::ConnectionBad: connection to server at "<private-ip>", port 5433
+failed: Connection refused` — a real private-network host that just
+wasn't listening yet, not a config/DNS problem). Render doesn't
+guarantee a service's dependencies have finished starting before it
+boots. Fixed by polling with `pg_isready -d "$DATABASE_URL"` (up to 30
+attempts, 5s apart, ~2.5 minutes total) before running `db:prepare`, so
+this is a wait, not a retry-forever hope — if the database genuinely
+never comes up, the container exits with a clear log line instead of a
+raw `PG::ConnectionBad` trace. Verified directly: build under normal
+conditions ("Database is ready." within the same second, no added
+delay); build against a deliberately unreachable host (confirmed it
+polls instead of crashing on the first attempt).
+
 ### render.yaml also had three real schema bugs, fixed in the same pass
 
 While rebuilding the service list, `render.yaml` was validated

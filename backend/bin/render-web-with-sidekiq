@@ -13,6 +13,27 @@
 # idempotent (db:seed's seed files all skip already-present data), so
 # this is safe on the frequent cold-starts a free, spin-down-after-idle
 # service goes through — see ADR-0016.
+#
+# Render doesn't guarantee nachcare-db is actually accepting connections
+# by the time this container's first boot reaches this line (observed
+# directly on a real first deploy: PG::ConnectionBad "Connection
+# refused" against the private-network host/port from DATABASE_URL,
+# not a DNS/config problem — the database just hadn't finished starting
+# yet). pg_isready polls until it's actually ready instead of assuming
+# Render's dependency ordering covers this.
+echo "Waiting for database to accept connections..."
+for i in $(seq 1 30); do
+  if pg_isready -d "$DATABASE_URL" -q; then
+    echo "Database is ready."
+    break
+  fi
+  if [ "$i" -eq 30 ]; then
+    echo "Database never became ready after 30 attempts (~2.5 minutes) — giving up." >&2
+    exit 1
+  fi
+  sleep 5
+done
+
 bin/rails db:prepare
 bin/rails db:seed
 
