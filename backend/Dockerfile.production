@@ -1,0 +1,81 @@
+# Production image for the Rails API — see docs/adr/0015-render-demo-deployment.md.
+#
+# This is a SEPARATE file from backend/Dockerfile on purpose: that file is
+# explicitly dev-only (bind-mount pattern, dev/test gem groups, no asset
+# precompile step needed there because bundle install runs on every
+# container start against the live bind-mounted Gemfile). This file is
+# the opposite: no bind mount (code is COPYed in), production-only gems,
+# a non-root runtime user, and a multi-stage build so the final image
+# doesn't carry build toolchains (gcc, headers) or the .git directory.
+#
+# Do not edit backend/Dockerfile to look like this — local dev must keep
+# working exactly as it does today (ADR-0001).
+
+ARG RUBY_VERSION=3.3.12
+
+# ---- build stage -----------------------------------------------------
+FROM ruby:${RUBY_VERSION}-slim AS build
+
+RUN apt-get update -qq && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    libyaml-dev \
+    git \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+ENV RAILS_ENV=production \
+    BUNDLE_WITHOUT="development:test" \
+    BUNDLE_DEPLOYMENT="1" \
+    BUNDLE_PATH="/usr/local/bundle"
+
+COPY Gemfile Gemfile.lock ./
+RUN bundle install --jobs 4 --retry 3
+
+COPY . .
+
+# Speeds up boot time in the final image; safe no-op if it fails for any
+# reason (bootsnap cache is a pure optimization, not required for
+# correctness) — but it shouldn't fail since this is API-only (no asset
+# pipeline / propshaft / sprockets gem in the Gemfile, so no
+# assets:precompile step is needed or possible here).
+RUN bundle exec bootsnap precompile --gemfile app/ lib/ config/ || true
+
+# ---- final stage -------------------------------------------------------
+FROM ruby:${RUBY_VERSION}-slim
+
+RUN apt-get update -qq && apt-get install -y --no-install-recommends \
+    libpq5 \
+    curl \
+    postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV RAILS_ENV=production \
+    RAILS_LOG_TO_STDOUT=true \
+    RAILS_SERVE_STATIC_FILES=false \
+    BUNDLE_WITHOUT="development:test" \
+    BUNDLE_DEPLOYMENT="1" \
+    BUNDLE_PATH="/usr/local/bundle"
+
+WORKDIR /app
+
+COPY --from=build /usr/local/bundle /usr/local/bundle
+COPY --from=build /app /app
+
+# Non-root runtime user, per the task's requirement. Owns /app (source +
+# the Active Storage `storage/` disk-mount target, see ADR-0015) so it can
+# write logs/tmp/uploads; does NOT own /usr/local/bundle (gems are
+# read-only at runtime, no need for write access there).
+RUN groupadd --system --gid 1000 rails \
+    && useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash \
+    && mkdir -p log tmp storage tmp/pids tmp/cache \
+    && chown -R rails:rails /app
+
+USER rails:rails
+
+EXPOSE 3000
+
+ENTRYPOINT ["./bin/docker-entrypoint"]
+CMD ["./bin/rails", "server", "-b", "0.0.0.0"]

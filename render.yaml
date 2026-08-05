@@ -1,0 +1,231 @@
+# Render Blueprint — public demo/staging deployment. NOT a production
+# deployment cleared for real patient data (see docs/DEPLOYMENT.md and
+# docs/OPEN_DECISIONS.md). See docs/adr/0015-render-demo-deployment.md
+# for the reasoning behind every choice below.
+#
+# Region: every region-capable service is pinned to `frankfurt` (Render's
+# only EU region) per rule R8 (EU-only externals) — consistent with the
+# rest of this project's EU-only posture even though this is "just a
+# demo". Static sites don't accept a `region` field (Render serves them
+# from its global CDN regardless); everything else does.
+#
+# This file has NOT been validated against real Render infrastructure —
+# no Render account was created and no Blueprint sync was run as part of
+# preparing it (out of scope for this task). It has been checked by hand
+# against Render's current documented Blueprint schema
+# (render.com/docs/blueprint-spec, fetched while preparing this file).
+# Treat the first real Blueprint sync as the actual test.
+
+envVarGroups:
+  - name: nachcare-shared
+    envVars:
+      # Rendered app's Ruby toolchain reads RAILS_ENV from the image's own
+      # Dockerfile.production ENV already, but declaring it here too keeps
+      # this file self-documenting for anyone reading only the Blueprint.
+      - key: RAILS_ENV
+        value: production
+      - key: RAILS_LOG_LEVEL
+        value: info
+      - key: RAILS_MAX_THREADS
+        value: "5"
+      # Best-effort: makes Ruby's Time.now/Time.zone default to Berlin
+      # local time inside the container. NOT a full fix for
+      # docs/OPEN_DECISIONS.md's sidekiq-cron/Europe-Berlin gap (schedule.yml
+      # comment) — config.time_zone is never actually set in
+      # config/application.rb, and sidekiq-cron/fugit's own cron parsing
+      # may still operate in UTC regardless of this env var. Unverified;
+      # flagged in docs/DEPLOYMENT.md, not silently assumed fixed.
+      - key: TZ
+        value: Europe/Berlin
+
+      # --- Secrets Render generates itself at Blueprint-sync time ---
+      # None of these values are chosen by us, transported through this
+      # repo, or visible in this file — Render creates and stores each
+      # one directly when the Blueprint is first synced. This is
+      # deliberately preferred over us running `bin/rails secret` and
+      # pasting a value in: it means these secrets exist nowhere outside
+      # Render's own secret store, not even transiently.
+      - key: SECRET_KEY_BASE
+        generateValue: true
+      - key: ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY
+        generateValue: true
+      - key: ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY
+        generateValue: true
+      - key: ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT
+        generateValue: true
+      - key: CAREGIVER_DEVICE_TOKEN_PEPPER
+        generateValue: true
+      - key: CAREGIVER_PIN_PEPPER
+        generateValue: true
+      # DEVISE_JWT_SECRET_KEY intentionally NOT set — devise.rb already
+      # falls back to secret_key_base when unset (see initializer), so a
+      # second generated secret here would be redundant.
+
+      # --- Web Push (VAPID) — see docs/adr/0015 for why these can't use
+      # generateValue like the secrets above: the public half is baked
+      # into the caregiver frontend's production build at build time
+      # (frontend/projects/caregiver/src/environments/environment.prod.ts),
+      # so both halves of this specific EC keypair had to be generated
+      # up front, outside Render, and the public half committed. ---
+      - key: VAPID_PUBLIC_KEY
+        value: BAOBpVebURrXotJG-C0ARFfc2BJw4xX5O6qyklhChPqGb3SbYD4tPxvrK68pcEL3oVf0_nwIkonhsQpE33ZzLAA
+      - key: VAPID_PRIVATE_KEY
+        sync: false # set once in the Render dashboard — see docs/DEPLOYMENT.md
+      - key: VAPID_SUBJECT
+        value: "mailto:ops@example.eu" # PLACEHOLDER contact address, change if desired
+
+      # --- AI gateway kill switches (Section 6) ---
+      # Left "on" so the UI shows the real degrade-gracefully states
+      # (routed-to-nurse, template-only brief, hidden draft panel) rather
+      # than hiding AI-adjacent screens outright — see docs/DEPLOYMENT.md
+      # for exactly what this means with no provider credentials set.
+      - key: AI_ASSISTANT_ENABLED
+        value: "true"
+      - key: AI_COPILOT_ENABLED
+        value: "true"
+      # ANTHROPIC_API_KEY / GEMINI_API_KEY deliberately NOT set here — see
+      # docs/DEPLOYMENT.md "AI provider keys" section and ADR-0014/R8. The
+      # production ai.yml block (providers.primary: bedrock_anthropic,
+      # fallback: azure_openai) is also left uncredentialed for this demo
+      # (no AWS/Azure secrets set below) — see that same section for the
+      # exact resulting behavior (task-level graceful degradation, not a
+      # stub provider — production's ai.yml has no stub fallback).
+
+services:
+  # --- Rails API -----------------------------------------------------
+  - type: web
+    name: nachcare-backend
+    runtime: docker
+    plan: starter # paid plan required: this service has a disk attached (see below)
+    region: frankfurt
+    dockerfilePath: ./backend/Dockerfile.production
+    dockerContext: ./backend
+    healthCheckPath: /up
+    # db:prepare: applies pending migrations, or creates+migrates a fresh
+    # DB on the very first deploy (idempotent either way). db:seed loads
+    # db/seeds.rb (drugs, ruleset, knowledge base, learn content) — all
+    # four seed files are idempotent (skip if already present), safe to
+    # run on every deploy. This deliberately does NOT run
+    # db/seeds/ingrid_scenario.rb (full Ingrid/Sabine demo story incl. a
+    # nurse login with a fixed, publicly-known password) — that stays a
+    # manual, explicit post-deploy step. See docs/DEPLOYMENT.md.
+    preDeployCommand: "bin/rails db:prepare && bin/rails db:seed"
+    disk:
+      name: nachcare-active-storage
+      # Matches storage.yml's `local` service (Rails.root.join("storage"))
+      # inside this image, whose WORKDIR is /app (backend/Dockerfile.production).
+      # Checked: only web controllers (check_in_photos_controller.rb,
+      # messages_controller.rb) touch ActiveStorage blobs — no Sidekiq job
+      # does — so a disk on this service alone is sufficient; the worker
+      # below doesn't need one (Render disks are single-service anyway).
+      mountPath: /app/storage
+      sizeGB: 1
+    envVarGroups:
+      - nachcare-shared
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: nachcare-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: nachcare-redis
+          property: connectionString
+      - key: CAREGIVER_APP_ORIGIN
+        value: https://nachcare-caregiver.onrender.com
+      - key: COCKPIT_APP_ORIGIN
+        value: https://nachcare-cockpit.onrender.com
+
+  # --- Sidekiq worker (schedule.yml's cron jobs + async jobs) --------
+  - type: worker
+    name: nachcare-sidekiq
+    runtime: docker
+    plan: starter
+    region: frankfurt
+    dockerfilePath: ./backend/Dockerfile.production
+    dockerContext: ./backend
+    dockerCommand: bundle exec sidekiq
+    # No preDeployCommand here — nachcare-backend's preDeployCommand
+    # above already runs db:prepare/db:seed against the same shared
+    # Postgres before either service's new instance takes traffic.
+    # sidekiq-cron loads config/schedule.yml at boot
+    # (config/initializers/sidekiq.rb, Sidekiq.configure_server block) —
+    # no separate wiring needed, confirmed by reading that initializer.
+    envVarGroups:
+      - nachcare-shared
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: nachcare-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: nachcare-redis
+          property: connectionString
+
+  # --- Caregiver PWA (static Angular build) --------------------------
+  - type: web
+    name: nachcare-caregiver
+    runtime: static
+    buildCommand: cd frontend && npm ci && npx ng build caregiver --configuration production
+    staticPublishPath: frontend/dist/caregiver/browser
+    buildFilter:
+      paths:
+        - frontend/**
+        - render.yaml
+    headers:
+      - path: /sw.js
+        headers:
+          - key: Cache-Control
+            value: no-cache
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  # --- Clinical cockpit (static Angular build) -----------------------
+  - type: web
+    name: nachcare-cockpit
+    runtime: static
+    buildCommand: cd frontend && npm ci && npx ng build cockpit --configuration production
+    staticPublishPath: frontend/dist/cockpit/browser
+    buildFilter:
+      paths:
+        - frontend/**
+        - render.yaml
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  # --- Redis-compatible cache/queue (Render calls this product "Key
+  # Value"; `keyvalue` is the current Blueprint type, `redis` is a
+  # deprecated alias for it). Backs Sidekiq's queue and ActionCable's
+  # `production` cable.yml adapter (config/cable.yml already reads
+  # REDIS_URL — no code change needed there). ---
+  - type: keyvalue
+    name: nachcare-redis
+    plan: free
+    region: frankfurt
+    maxmemoryPolicy: noeviction # Sidekiq job data must not be evicted under memory pressure
+    ipAllowList: [] # blocks public internet access; same-region Render services still reach it over the private network
+
+databases:
+  - name: nachcare-db
+    databaseName: nachcare_production
+    user: nachcare
+    region: frankfurt
+    # Free Render Postgres expires 30 days after creation (14-day grace
+    # period, then deletion) — see docs/DEPLOYMENT.md for the prominent
+    # callout and the one-line upgrade (`plan: basic-256mb`) if this demo
+    # needs to outlive that window. Defaulted to `free` here to not
+    # impose a recurring cost decision on the product owner's behalf.
+    plan: free
+    postgresMajorVersion: "17" # matches pgvector/pgvector:pg17 used in ops/docker-compose.yml
+    # pgvector must be enabled with `CREATE EXTENSION IF NOT EXISTS vector;`
+    # after the database exists — render.yaml's `databases` schema has no
+    # field for enabling extensions (checked against the current
+    # Blueprint spec). See docs/DEPLOYMENT.md for the exact one-time
+    # step; unverified against a real Render Postgres instance.

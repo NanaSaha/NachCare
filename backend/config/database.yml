@@ -54,6 +54,11 @@ test:
 #
 production:
   <<: *default
-  database: app_production
-  username: app
-  password: <%= ENV["APP_DATABASE_PASSWORD"] %>
+  # Never wired to a real deployment before this point (the database/
+  # username/password below were Rails' generated boilerplate, not real
+  # config — this project has consistently used explicit ENV vars, never
+  # baked-in names). Render's managed Postgres (docs/adr/0015-*.md)
+  # exposes a single connection string via DATABASE_URL, which Rails
+  # parses and merges over the `default` anchor's other keys (encoding,
+  # pool) automatically — see the comment block above for how this works.
+  url: <%= ENV["DATABASE_URL"] %>

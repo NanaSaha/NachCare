@@ -3,6 +3,10 @@ ops/.env
 .env
 .env.local
 
+# Generated production VAPID private key (docs/adr/0015-*.md) — handed to
+# the product owner directly, never committed. See docs/DEPLOYMENT.md.
+ops/vapid_production_key.local.txt
+
 # OS cruft
 .DS_Store
 

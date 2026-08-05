@@ -10,6 +10,7 @@ backed by env-var configuration, never hardcoded endpoints/regions.
 | SMS adapter | RED-flag fallback chain, missed-day chain | EU provider (TBD) | `SMS_PROVIDER_URL`, `SMS_API_KEY` | `LogAdapter` (dev-only) until a real EU provider is contracted — see OPEN_DECISIONS #5 |
 | Email adapter | Notification fallback | EU provider (TBD) | `EMAIL_PROVIDER_URL`, `EMAIL_API_KEY` | `LogAdapter` (dev-only) until a real EU provider is contracted |
 | S3-compatible object storage | `check_in_photos` (ActiveStorage), production only | EU region (TBD) | `STORAGE_S3_REGION`, `STORAGE_S3_BUCKET`, `STORAGE_S3_*` creds | Local disk in dev; EU bucket to be selected |
+| Render (render.com) | Application hosting: Rails API, Sidekiq worker, Postgres, Key Value (Redis), both Angular static sites — public demo/staging deployment only, see `docs/DEPLOYMENT.md` | `frankfurt` (Render's EU region; region pinned per-service in `render.yaml`, static sites don't accept a region field — served from Render's global CDN instead) | N/A (infra provisioning, not an app-level env var) | Deployment prepared (`render.yaml`, `docs/adr/0015-render-demo-deployment.md`); real Blueprint sync not yet performed as of this row's addition — see `docs/DEPLOYMENT.md` for what remains manual |
 
 No subprocessor here should ever be pointed at a non-EU region/endpoint.
 

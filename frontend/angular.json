@@ -47,7 +47,13 @@
                   "maximumError": "16kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "projects/caregiver/src/environments/environment.ts",
+                  "with": "projects/caregiver/src/environments/environment.prod.ts"
+                }
+              ]
             },
             "development": {
               "optimization": false,
@@ -146,7 +152,13 @@
                   "maximumError": "16kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "projects/cockpit/src/environments/environment.ts",
+                  "with": "projects/cockpit/src/environments/environment.prod.ts"
+                }
+              ]
             },
             "development": {
               "optimization": false,
