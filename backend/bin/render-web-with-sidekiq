@@ -1,0 +1,29 @@
+#!/bin/bash -e
+# Runs Puma and Sidekiq in a single container process — used only by
+# nachcare-backend's `dockerCommand` in render.yaml. Exists because
+# Render's free instance type has no equivalent for a separate background
+# worker service (see docs/adr/0016-free-tier-render-deployment.md): to
+# stay at $0/month, Sidekiq's job processing (schedule.yml's cron jobs +
+# async jobs) has to share the one free web service instead of running as
+# its own paid `nachcare-sidekiq` worker.
+#
+# Both children are started in the background so this script's own PID 1
+# can trap and forward SIGTERM/SIGINT to both on container stop/redeploy —
+# `bin/rails server & exec ...` would leave Sidekiq unable to receive the
+# signal at all (Docker only signals PID 1).
+bundle exec sidekiq &
+sidekiq_pid=$!
+
+bin/rails server -b 0.0.0.0 &
+puma_pid=$!
+
+trap 'kill -TERM "$sidekiq_pid" "$puma_pid" 2>/dev/null' TERM INT
+
+# Exit as soon as either process dies, with its exit code — mirrors how a
+# single-process container normally behaves, and surfaces a Sidekiq crash
+# as a container failure instead of silently limping along web-only.
+wait -n "$sidekiq_pid" "$puma_pid"
+exit_code=$?
+kill -TERM "$sidekiq_pid" "$puma_pid" 2>/dev/null
+wait
+exit "$exit_code"

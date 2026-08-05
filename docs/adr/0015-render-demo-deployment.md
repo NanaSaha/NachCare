@@ -1,6 +1,11 @@
 # ADR-0015: Render Blueprint for the public demo/staging deployment
 
-**Status:** Accepted
+**Status:** Accepted, partially superseded by
+[ADR-0016](0016-free-tier-render-deployment.md) — the separate paid
+`nachcare-sidekiq` worker and `nachcare-backend`'s persistent disk
+described below were replaced with a merged free-tier process to bring
+this deployment to $0/month. Everything else in this ADR (Dockerfile
+design, `preDeployCommand`, VAPID handling, region choice) is unchanged.
 **Date:** 2026-08-05
 
 ## Context

@@ -1,7 +1,9 @@
-# Render Blueprint — public demo/staging deployment. NOT a production
-# deployment cleared for real patient data (see docs/DEPLOYMENT.md and
-# docs/OPEN_DECISIONS.md). See docs/adr/0015-render-demo-deployment.md
-# for the reasoning behind every choice below.
+# Render Blueprint — public demo/staging deployment, $0/month as
+# configured. NOT a production deployment cleared for real patient data
+# (see docs/DEPLOYMENT.md and docs/OPEN_DECISIONS.md). See
+# docs/adr/0015-render-demo-deployment.md for the original deployment
+# architecture and docs/adr/0016-free-tier-render-deployment.md for the
+# free-tier redesign (merged backend+Sidekiq process, no persistent disk).
 #
 # Region: every region-capable service is pinned to `frankfurt` (Render's
 # only EU region) per rule R8 (EU-only externals) — consistent with the
@@ -92,14 +94,23 @@ envVarGroups:
       # stub provider — production's ai.yml has no stub fallback).
 
 services:
-  # --- Rails API -----------------------------------------------------
+  # --- Rails API + Sidekiq (merged into one free process) -------------
+  # Render has no free instance type for background workers at all (only
+  # web services, static sites, Postgres, and Key Value get one) — so to
+  # keep this deployment at $0/month, Sidekiq runs inside the same
+  # container as Puma instead of as its own `nachcare-sidekiq` worker
+  # service. See docs/adr/0016-free-tier-render-deployment.md for the
+  # trade-offs this accepts (no persistent disk -> check-in photos are
+  # ephemeral; free-tier spin-down after 15min idle means schedule.yml's
+  # cron jobs only run while something is keeping the service awake).
   - type: web
     name: nachcare-backend
     runtime: docker
-    plan: starter # paid plan required: this service has a disk attached (see below)
+    plan: free
     region: frankfurt
     dockerfilePath: ./backend/Dockerfile.production
     dockerContext: ./backend
+    dockerCommand: ./bin/render-web-with-sidekiq
     healthCheckPath: /up
     # db:prepare: applies pending migrations, or creates+migrates a fresh
     # DB on the very first deploy (idempotent either way). db:seed loads
@@ -110,16 +121,12 @@ services:
     # nurse login with a fixed, publicly-known password) — that stays a
     # manual, explicit post-deploy step. See docs/DEPLOYMENT.md.
     preDeployCommand: "bin/rails db:prepare && bin/rails db:seed"
-    disk:
-      name: nachcare-active-storage
-      # Matches storage.yml's `local` service (Rails.root.join("storage"))
-      # inside this image, whose WORKDIR is /app (backend/Dockerfile.production).
-      # Checked: only web controllers (check_in_photos_controller.rb,
-      # messages_controller.rb) touch ActiveStorage blobs — no Sidekiq job
-      # does — so a disk on this service alone is sufficient; the worker
-      # below doesn't need one (Render disks are single-service anyway).
-      mountPath: /app/storage
-      sizeGB: 1
+    # No `disk:` — free web services can't have one (Render docs). Active
+    # Storage's `local` service still writes to storage/ inside the
+    # container, but that path is now ephemeral: it's wiped on every
+    # restart/redeploy/spin-down. Acceptable for a demo, not for real use
+    # — see ADR-0016.
+    #
     # A service has no `envVarGroups` field in Render's Blueprint schema
     # (checked against render.com/schema/render.yaml.json —
     # `serverService` is `additionalProperties: false` and doesn't list
@@ -141,33 +148,6 @@ services:
         value: https://nachcare-caregiver.onrender.com
       - key: COCKPIT_APP_ORIGIN
         value: https://nachcare-cockpit.onrender.com
-
-  # --- Sidekiq worker (schedule.yml's cron jobs + async jobs) --------
-  - type: worker
-    name: nachcare-sidekiq
-    runtime: docker
-    plan: starter
-    region: frankfurt
-    dockerfilePath: ./backend/Dockerfile.production
-    dockerContext: ./backend
-    dockerCommand: bundle exec sidekiq
-    # No preDeployCommand here — nachcare-backend's preDeployCommand
-    # above already runs db:prepare/db:seed against the same shared
-    # Postgres before either service's new instance takes traffic.
-    # sidekiq-cron loads config/schedule.yml at boot
-    # (config/initializers/sidekiq.rb, Sidekiq.configure_server block) —
-    # no separate wiring needed, confirmed by reading that initializer.
-    envVars:
-      - fromGroup: nachcare-shared
-      - key: DATABASE_URL
-        fromDatabase:
-          name: nachcare-db
-          property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: keyvalue
-          name: nachcare-redis
-          property: connectionString
 
   # --- Caregiver PWA (static Angular build) --------------------------
   - type: web

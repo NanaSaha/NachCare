@@ -27,7 +27,8 @@ Everything in this repo is ready to deploy as-is:
 
 - `backend/Dockerfile.production` — production Rails image, built and
   boot-tested locally (see "What was verified locally" below).
-- `render.yaml` — a Render Blueprint defining all 6 services.
+- `render.yaml` — a Render Blueprint defining all 4 services + 1
+  database, entirely on free instance types (ADR-0016).
 - Angular production builds wired (`frontend/angular.json`
   `fileReplacements`) to point at the real deployed backend URL instead of
   `localhost:3001`.
@@ -53,9 +54,13 @@ just follow the steps below in Render's web UI.
 1. In the Render dashboard, click **New -> Blueprint**.
 2. Select the `NanaSaha/NachCare` repo, branch `main`.
 3. Render finds `render.yaml` at the repo root automatically and shows a
-   preview of all 6 services it's about to create:
-   - `nachcare-backend` (web, Docker, Frankfurt)
-   - `nachcare-sidekiq` (background worker, Docker, Frankfurt)
+   preview of the 4 services + 1 database it's about to create, all on
+   free instance types (see `docs/adr/0016-free-tier-render-deployment.md`
+   for why this is 4 services, not the 6 an earlier version of this file
+   described):
+   - `nachcare-backend` (web, Docker, Frankfurt) — runs both Puma *and*
+     Sidekiq in one process (`bin/render-web-with-sidekiq`); Render has no
+     free instance type for a separate background worker service
    - `nachcare-caregiver` (static site — the caregiver PWA)
    - `nachcare-cockpit` (static site — the clinical cockpit)
    - `nachcare-redis` (Key Value, Frankfurt)
@@ -66,8 +71,8 @@ just follow the steps below in Render's web UI.
 
 Render will pause and ask you to fill in any env var marked `sync: false`
 in `render.yaml` — there is exactly one: `VAPID_PRIVATE_KEY` on the
-`nachcare-backend` and `nachcare-sidekiq` services (via the shared
-`nachcare-shared` env var group).
+`nachcare-backend` service (via the shared `nachcare-shared` env var
+group).
 
 The value is in a file on disk in this repo checkout, **not committed to
 git** (gitignored on purpose — see `docs/adr/0015-*.md` for why this one
@@ -93,7 +98,7 @@ Click **Apply** (or **Create New Resources**, wording may vary by Render
 UI version). Render will:
 
 1. Create the Postgres database and Key Value instance first.
-2. Build both Docker images (`nachcare-backend`, `nachcare-sidekiq`) from
+2. Build `nachcare-backend`'s Docker image from
    `backend/Dockerfile.production`.
 3. Run `nachcare-backend`'s `preDeployCommand`
    (`bin/rails db:prepare && bin/rails db:seed`) — creates the schema and
@@ -101,11 +106,23 @@ UI version). Render will:
    content (all idempotent, safe to run again on every future deploy).
 4. Build both static sites (`npm ci && npx ng build <project>
    --configuration production` in `frontend/`).
-5. Start `nachcare-backend` (Puma) and `nachcare-sidekiq` (Sidekiq, which
-   loads `config/schedule.yml`'s cron jobs automatically on boot).
+5. Start `nachcare-backend` via `bin/render-web-with-sidekiq`, which runs
+   Puma and Sidekiq (loads `config/schedule.yml`'s cron jobs on boot) as
+   two processes inside the one container — see
+   `docs/adr/0016-free-tier-render-deployment.md` for why they're merged
+   instead of separate services.
 
-First deploy will likely take several minutes (Docker image builds are the
-slow part). Watch each service's **Logs** tab in the Render dashboard.
+First deploy will likely take several minutes (the Docker image build is
+the slow part). Watch the service's **Logs** tab in the Render dashboard.
+
+**Free-tier behavior to expect, not a bug:** `nachcare-backend` spins down
+after 15 minutes with no inbound traffic (Render's free web service
+limit) and cold-starts on the next request — this also pauses Sidekiq
+(and `schedule.yml`'s cron jobs) for as long as it's spun down, since
+they're the same process. A demo that gets visited regularly stays warm;
+one that sits idle for hours will have a slow first request and may have
+missed a scheduled job tick in the meantime. See ADR-0016 if this becomes
+a real problem — the fix is reverting to a separate paid Sidekiq worker.
 
 **Known gap in this step, unverified:** whether `preDeployCommand` behaves
 exactly as documented for `runtime: docker` services was not something
@@ -256,8 +273,8 @@ order of how consistent they are with this project's own rules:
   credentials**: set `AWS_REGION=eu-central-1` +
   `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` (Bedrock) and/or
   `AZURE_OPENAI_ENDPOINT`/`AZURE_OPENAI_DEPLOYMENT`/`AZURE_OPENAI_KEY` as
-  extra env vars on `nachcare-backend`/`nachcare-sidekiq` once you have
-  real EU-hosted accounts for either.
+  extra env vars on `nachcare-backend` once you have real EU-hosted
+  accounts for either.
 - **Same deliberate, documented R8 exception this project already made
   for local dev (ADR-0014)**: add `ANTHROPIC_API_KEY` or `GEMINI_API_KEY`
   as an env var and set `AI_PROVIDER_OVERRIDE=anthropic` or `=gemini`.
@@ -267,13 +284,25 @@ order of how consistent they are with this project's own rules:
 
 ## 9. Cost overview (as configured in `render.yaml` today)
 
+This deployment is **$0/month as configured** — see
+`docs/adr/0016-free-tier-render-deployment.md` for the trade-offs this
+required (no persistent disk, Sidekiq merged into the web process, and
+the free-tier spin-down behavior described in step 4 above).
+
 | Service | Plan | Why | Approx. cost |
 |---|---|---|---|
-| `nachcare-backend` | `starter` | Needs a paid plan for the ActiveStorage persistent disk | Render's published Starter web service rate |
-| `nachcare-sidekiq` | `starter` | Needs to run continuously for `schedule.yml`'s cron jobs | Render's published Starter worker rate |
+| `nachcare-backend` | `free` | Runs Puma + Sidekiq in one process (ADR-0016) — no separate paid worker needed, no persistent disk | $0 |
 | `nachcare-db` | `free` | Kept free by default so this deployment doesn't impose a recurring cost decision for you — **but see the callout below** | $0, for 30 days |
 | `nachcare-redis` | `free` | Demo-scope Sidekiq queue/ActionCable pubsub; data loss on restart is a minor inconvenience here, not a real risk | $0 |
 | `nachcare-caregiver` / `nachcare-cockpit` | (static, no plan field) | Static sites are always free on Render | $0 |
+
+**If you'd rather pay ~$14/month for a closer-to-production setup**
+(persistent disk for check-in photos, a real always-on Sidekiq worker, no
+15-minute spin-down): revert `nachcare-backend` to `plan: starter`, add
+back its `disk:` block, change `dockerCommand` back to the default
+(remove the line entirely), and re-add a separate `nachcare-sidekiq`
+worker service — see ADR-0016 for the exact shape this had before the
+free-tier redesign (or `git log -p render.yaml` for the literal diff).
 
 **Important: `nachcare-db`'s free Postgres plan expires 30 days after
 creation** (14-day grace period, then the database and all its data are
@@ -322,10 +351,20 @@ re-runs `nachcare-backend`'s `preDeployCommand`
 - Full backend test suite + rubocop re-run inside the existing dev Docker
   container after the `database.yml` production-block change: **616
   examples, 0 failures; 392 files inspected, no offenses**.
-- `render.yaml` parses as valid YAML and was hand-checked field-by-field
-  against Render's currently-documented Blueprint schema
-  (render.com/docs/blueprint-spec and Render's own `render-oss/skills`
-  reference docs, fetched while preparing this file).
+- `render.yaml` validates against Render's actual published JSON Schema
+  (`render.com/schema/render.yaml.json`, checked programmatically with
+  `jsonschema`, not just hand-read against docs) — this caught three real
+  errors an earlier revision had (`envVarGroups` isn't a valid service
+  key, `headers` had the wrong shape, `ipAllowList` is required on
+  `keyvalue` services) that hand-checking against doc prose had missed or
+  gotten backwards.
+- `bin/render-web-with-sidekiq` (the script that runs Puma + Sidekiq in
+  one container for the free-tier deploy, ADR-0016) was built into the
+  production image and run against the real dev Postgres/Redis
+  containers: both processes came up (confirmed via the boot logs and a
+  `/up` health check), and `docker stop` shut both down cleanly within
+  its grace period — no force-kill needed, confirming the SIGTERM
+  trap/forward logic actually works, not just reads correctly.
 
 **Not verified — genuinely requires a real Render account, out of scope
 for this preparation work:**
