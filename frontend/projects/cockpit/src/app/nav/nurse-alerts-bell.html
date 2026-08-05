@@ -1,0 +1,33 @@
+<div class="nurse-alerts-bell" data-testid="nurse-alerts-bell">
+  <button
+    type="button"
+    class="bell-button"
+    (click)="toggle()"
+    [attr.aria-label]="'nurseAlerts.bellLabel' | translate"
+    data-testid="nurse-alerts-bell-button"
+  >
+    🔔
+    @if (nurseAlerts.unreadCount() > 0) {
+      <span class="badge" data-testid="nurse-alerts-badge">{{ nurseAlerts.unreadCount() }}</span>
+    }
+  </button>
+
+  @if (open()) {
+    <div class="dropdown" data-testid="nurse-alerts-dropdown">
+      <h2>{{ 'nurseAlerts.title' | translate }}</h2>
+      <ul>
+        @for (alert of nurseAlerts.alerts(); track alert.type + '-' + alert.episode_ref + '-' + alert.occurred_at) {
+          <li>
+            <a [routerLink]="['/patients', alert.patient_id]" (click)="close()" data-testid="nurse-alert-item">
+              <span class="alert-patient">{{ alert.pseudonym_code }} ({{ alert.initials }})</span>
+              <span class="alert-description">{{ descriptionKey(alert) | translate }}</span>
+              <span class="alert-time">{{ alert.occurred_at | date: 'short' }}</span>
+            </a>
+          </li>
+        } @empty {
+          <li class="empty">{{ 'nurseAlerts.empty' | translate }}</li>
+        }
+      </ul>
+    </div>
+  }
+</div>

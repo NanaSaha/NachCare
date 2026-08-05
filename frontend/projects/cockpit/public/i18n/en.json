@@ -1,0 +1,278 @@
+{
+  "severity": {
+    "green": "All good",
+    "yellow": "Needs attention",
+    "red": "Urgent"
+  },
+  "languageNames": {
+    "en": "English",
+    "de": "Deutsch",
+    "tr": "Türkçe",
+    "ru": "Русский",
+    "ar": "العربية"
+  },
+  "auth": {
+    "title": "NachCare AI Cockpit",
+    "email": "Email",
+    "password": "Password",
+    "otpAttempt": "Authenticator code (if enabled)",
+    "signIn": "Sign in",
+    "signingIn": "Signing in…",
+    "signInFailed": "Incorrect email, password, or code."
+  },
+  "enrollment": {
+    "title": "Enroll a patient",
+    "patientSection": "Patient",
+    "initials": "Initials",
+    "birthYear": "Birth year",
+    "nyhaClass": "NYHA class",
+    "caregiverSection": "Primary caregiver",
+    "displayName": "Name",
+    "relationship": "Relationship to patient",
+    "language": "Preferred language",
+    "medicationsSection": "Current medications",
+    "medicationSearchPlaceholder": "Search or type a medication name",
+    "removeMedication": "Remove medication",
+    "submit": "Enroll patient",
+    "submitting": "Enrolling…",
+    "submitFailed": "Something went wrong. Please check the form and try again.",
+    "successTitle": "Patient enrolled",
+    "codeLabel": "Give this activation code to the caregiver:",
+    "expires": "Expires",
+    "downloadPdf": "Download printable code sheet",
+    "enrollAnother": "Enroll another patient"
+  },
+  "nav": {
+    "triage": "Triage",
+    "patients": "Patients",
+    "enroll": "Enroll",
+    "analytics": "Analytics",
+    "riskModel": "Risk model"
+  },
+  "nurseAlerts": {
+    "bellLabel": "Caregiver activity alerts",
+    "title": "Recent caregiver activity",
+    "empty": "No alerts yet this session.",
+    "item": {
+      "check_in": "submitted a check-in",
+      "caregiver_message": "sent a status update",
+      "dose": {
+        "taken": "marked a dose taken",
+        "missed": "marked a dose missed"
+      }
+    }
+  },
+  "triage": {
+    "title": "Triage queue",
+    "loading": "Loading…",
+    "empty": "No flags to show.",
+    "back": "← Back",
+    "kpi": {
+      "open": "Open",
+      "inProgress": "In progress",
+      "red": "Red",
+      "yellow": "Yellow",
+      "breached": "Breached",
+      "aiWatch": "AI Watch"
+    },
+    "filters": {
+      "all": "All",
+      "open": "Open",
+      "inProgress": "In progress",
+      "resolved": "Resolved"
+    },
+    "state": {
+      "open": "Open",
+      "in_progress": "In progress",
+      "resolved": "Resolved"
+    },
+    "slaMinutes": "min left",
+    "slaBreached": "SLA breached",
+    "detail": {
+      "trend": "Weight trend",
+      "noCheckIns": "No check-ins in the last 14 days.",
+      "firedRules": "Evaluations",
+      "interventions": "Interventions",
+      "takeAction": "Take action",
+      "outcome": "Outcome",
+      "note": "Note",
+      "markInProgress": "Mark in progress",
+      "markResolved": "Mark resolved",
+      "copilot": {
+        "title": "AI suggestion",
+        "loading": "Generating suggestion…",
+        "unavailable": "No AI suggestion available right now.",
+        "useDraft": "Use this draft",
+        "refresh": "Regenerate"
+      },
+      "conversation": {
+        "title": "Assistant conversation",
+        "loading": "Loading…",
+        "empty": "No assistant conversation yet.",
+        "caregiverRole": "Caregiver",
+        "assistantRole": "Assistant",
+        "citedFrom": "Source:",
+        "routedBadge": "Routed to care team",
+        "emergencyBadge": "Emergency detected"
+      }
+    },
+    "aiWatch": {
+      "badge": "AI Watch",
+      "sectionTitle": "AI Watch (predictive — nurse review)",
+      "rationale": {
+        "title": "Why this trajectory"
+      },
+      "actions": {
+        "title": "Nurse decision",
+        "acceptAndWatch": "Accept & watch (tighten observation)",
+        "acceptAndIntervene": "Accept & intervene",
+        "dismiss": "Dismiss (false positive)"
+      }
+    }
+  },
+  "bridgeArc": {
+    "dayLabel": "Day {{day}} of {{total}}",
+    "crossedLabel": "You crossed the bridge",
+    "caption": "90-day recovery journey",
+    "crossedCaption": "90 days, fully crossed",
+    "dayAria": "Recovery journey progress: day {{day}} of {{total}}",
+    "crossedAria": "Recovery journey complete — the bridge is fully crossed"
+  },
+  "patients": {
+    "title": "Patients",
+    "birthYear": "Born",
+    "graduation": {
+      "title": "Programme status",
+      "status": "Status:",
+      "graduate": "Graduate patient",
+      "graduating": "Graduating…",
+      "graduatedAt": "Graduated:",
+      "reportTitle": "Day-90 report",
+      "notEligible": "Eligible for graduation from day 90 of the episode.",
+      "failed": "Couldn't graduate this patient. Please try again."
+    },
+    "carePlan": {
+      "title": "Care plan",
+      "draftNotice": "This care plan hasn't been saved/activated yet — fill in the fields below and save to create the first active version.",
+      "dietRules": "Diet rules",
+      "careInstructions": "Home care instructions & general treatment plan",
+      "careInstructionsPlaceholder": "The full plan for this patient's care at home — daily routine, medication-taking guidance, activity/rest advice, warning signs to watch for, when to call the care team…",
+      "thresholds": "Clinical thresholds (JSON)",
+      "thresholdsGated": "[PLACEHOLDER_CLINICAL: only a physician can edit clinical thresholds — FR-N8]",
+      "save": "Save",
+      "medications": "Medications",
+      "noMedications": "No medications on file yet.",
+      "critical": "critical",
+      "addTime": "+ Add time",
+      "removeTime": "Remove time",
+      "doseInstructions": "Dose instructions",
+      "doseInstructionsPlaceholder": "e.g. 1 tablet with food",
+      "medicationName": "Medication name",
+      "medicationNamePlaceholder": "e.g. Bisoprolol",
+      "addMedication": "+ Add medication",
+      "removeMedication": "Remove medication",
+      "medicationNameRequired": "Every medication needs a name before you can save.",
+      "saveSchedules": "Save medication schedule",
+      "saving": "Saving…",
+      "scheduleSaveFailed": "Couldn't save the medication schedule. Please try again.",
+      "invalidJson": "That's not valid JSON.",
+      "saveFailed": "Couldn't save. Please try again."
+    },
+    "activity": {
+      "title": "Recent caregiver activity",
+      "empty": "No caregiver activity yet.",
+      "checkIn": "Check-in submitted",
+      "dose": {
+        "taken": "Dose taken",
+        "missed": "Dose missed",
+        "pending": "Dose pending"
+      }
+    },
+    "messages": {
+      "title": "Messages",
+      "empty": "No messages yet.",
+      "template": "Template",
+      "freeText": "Free text",
+      "templates": {
+        "checkin_reminder": "Check-in reminder",
+        "thank_you": "Thank you",
+        "low_salt_day": "Low-salt day",
+        "track_fluids_1_5l": "Track fluids: 1.5 L",
+        "elevate_legs_photo": "Elevate legs + photo",
+        "call_nurse_now": "[PLACEHOLDER_CLINICAL: call-nurse-now copy]"
+      },
+      "body": "Message",
+      "language": "Caregiver's language",
+      "preview": "Preview",
+      "previewing": "Loading preview…",
+      "previewFailed": "Couldn't load a preview. Please try again.",
+      "translatedReview": "Review before sending",
+      "notTranslated": "Translation unavailable right now — please write this by hand before sending.",
+      "send": "Send",
+      "sending": "Sending…",
+      "sendFailed": "Couldn't send. Please try again."
+    },
+    "sortByRiskTrend": "Sort by risk trend",
+    "sortDefault": "Default order",
+    "riskTrend": {
+      "rising": "Rising",
+      "stable": "Stable",
+      "improving": "Improving"
+    },
+    "cadence": {
+      "title": "Cadence proposal",
+      "direction": {
+        "taper": "Proposes tapering check-in frequency",
+        "densify": "Proposes densifying check-in frequency"
+      },
+      "approve": "Approve",
+      "dismiss": "Dismiss"
+    }
+  },
+  "analytics": {
+    "title": "Analytics",
+    "subtitle": "Pilot metrics for your site — aggregate counts only, no patient-identifying detail.",
+    "from": "From",
+    "to": "To",
+    "apply": "Apply",
+    "loadFailed": "Couldn't load pilot metrics. Please try again.",
+    "exportCsv": "Export CSV",
+    "exportPdf": "Export PDF",
+    "exporting": "Exporting…",
+    "footnote": "A metric shows — when there isn't enough data yet for that period.",
+    "metrics": {
+      "checkinAdherence": "Check-in adherence",
+      "slaCompliance": "RED-flag SLA compliance",
+      "timeToAction": "RED-flag time to action (median)",
+      "completion": "Programme completion (day-90)",
+      "safetyRouting": "Assistant safety-routing rate"
+    }
+  },
+  "riskModel": {
+    "title": "Risk model (shadow / promotion)",
+    "disclaimer": "Heuristic trajectory scorer — an MVP placeholder, not a validated clinical predictor. See ADR-0012.",
+    "promoted": "Promoted — AI WATCH is live for this site",
+    "shadowMode": "Shadow mode — AI WATCH is not shown to anyone yet",
+    "gates": {
+      "title": "Promotion gates",
+      "insufficientData": "Insufficient data to evaluate the gates yet — this is expected in a fresh dev/demo environment.",
+      "leadTime": "Earlier detection than rules (median)",
+      "days": "days",
+      "samples": "samples",
+      "alertRate": "Alert rate per check-in",
+      "checkins": "check-ins",
+      "missedReds": "Missed reds",
+      "overallMet": "All gates met",
+      "overallNotMet": "Gates not met"
+    },
+    "promote": {
+      "title": "Promotion decision",
+      "overrideLabel": "Promote anyway (dev/demo override — in production this requires real gate-passing data)",
+      "promoteButton": "Promote",
+      "promoteOverrideButton": "Promote anyway (override)"
+    },
+    "history": {
+      "title": "Decision history"
+    }
+  }
+}

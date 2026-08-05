@@ -1,0 +1,118 @@
+.nurse-alerts-bell {
+  position: relative;
+  display: inline-flex;
+}
+
+.bell-button {
+  position: relative;
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 0.4rem 0.6rem;
+  line-height: 1;
+  border-radius: var(--radius-sm);
+  transition: background var(--duration-fast) var(--ease-standard);
+}
+
+.bell-button:hover {
+  background: var(--evergreen-soft);
+}
+
+.badge {
+  position: absolute;
+  top: 0;
+  right: 0.15rem;
+  background: var(--coral);
+  color: white;
+  border-radius: var(--radius-pill);
+  font-size: 0.65rem;
+  font-weight: 700;
+  min-width: 1.1rem;
+  height: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.25rem;
+  box-shadow: 0 0 0 2px var(--card);
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: var(--space-2);
+  width: 340px;
+  max-height: 420px;
+  overflow-y: auto;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-3);
+  z-index: 20;
+  animation: dropdown-in var(--duration-fast) var(--ease-standard) both;
+}
+
+@keyframes dropdown-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown h2 {
+  margin: 0 0 var(--space-2);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.dropdown ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.dropdown a {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: var(--ink);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-2);
+  transition: background var(--duration-fast) var(--ease-standard);
+}
+
+.dropdown a:hover {
+  background: var(--evergreen-soft);
+}
+
+.alert-patient {
+  font-weight: 600;
+}
+
+.alert-description {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.alert-time {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.dropdown .empty {
+  color: var(--muted);
+  font-style: italic;
+  padding: var(--space-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dropdown {
+    animation: none;
+  }
+}

@@ -1,0 +1,47 @@
+.app-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-3) var(--space-6);
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+  font-family: var(--font-ui);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.app-nav__brand {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--evergreen-deep);
+  margin-right: var(--space-4);
+}
+
+.app-nav__brand-accent {
+  color: var(--evergreen);
+}
+
+.app-nav a {
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.92rem;
+  padding: 0.4rem 0.1rem;
+  border-bottom: 2px solid transparent;
+  transition: color var(--duration-fast) var(--ease-standard), border-color var(--duration-fast) var(--ease-standard);
+}
+
+.app-nav a:hover {
+  color: var(--evergreen-deep);
+}
+
+.app-nav a.active {
+  color: var(--evergreen-deep);
+  border-bottom-color: var(--evergreen);
+}
+
+.nav-bell {
+  margin-left: auto;
+}

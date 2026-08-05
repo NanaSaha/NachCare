@@ -1,0 +1,36 @@
+.severity {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.3em 0.75em;
+  border-radius: 999px;
+  font-family: var(--font-ui);
+  font-weight: 500;
+  font-size: 0.9rem;
+  line-height: 1.2;
+  border: 1px solid transparent;
+}
+
+.severity__icon {
+  width: 1.1em;
+  height: 1.1em;
+  flex: none;
+}
+
+.severity--green {
+  background: var(--green-soft);
+  color: var(--green);
+  border-color: var(--green);
+}
+
+.severity--yellow {
+  background: var(--amber-soft);
+  color: var(--amber);
+  border-color: var(--amber);
+}
+
+.severity--red {
+  background: var(--coral-soft);
+  color: var(--coral);
+  border-color: var(--coral);
+}

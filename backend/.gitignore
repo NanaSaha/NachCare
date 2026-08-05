@@ -1,0 +1,29 @@
+/log/*
+!/log/.keep
+/tmp/*
+!/tmp/.keep
+!/tmp/pids/
+/tmp/pids/*
+!/tmp/pids/.keep
+/tmp/storage/*
+!/tmp/storage/.keep
+/storage/*
+!/storage/.keep
+/public/assets
+
+# Ignore master key for decrypting credentials and any other unencrypted
+# secrets.
+/config/master.key
+/config/credentials/*.key
+
+.env
+.byebug_history
+
+# Ignore SQLite/other local database files (not used — Postgres via
+# ops/docker-compose.yml — but a stray one shouldn't get committed).
+/db/*.sqlite3
+/db/*.sqlite3-*
+
+/coverage/
+/.bundle/
+/vendor/bundle/

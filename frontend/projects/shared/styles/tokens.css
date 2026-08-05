@@ -1,0 +1,83 @@
+/*
+ * Design tokens shared by the caregiver and cockpit apps.
+ * Verbatim from NachCareAI_Agent_Build_Instructions.md Section 2.
+ * AI-purple (--ai / --ai-soft) is reserved exclusively for AI-generated
+ * content; severity is always encoded as color + icon + text, never color
+ * alone.
+ */
+:root {
+  --ink: #14261f;
+  --evergreen: #0e5c4a;
+  --evergreen-deep: #0a4237;
+  --evergreen-soft: #e3efe9;
+  --paper: #fbfaf6;
+  --card: #ffffff;
+  --line: #e4e2d8;
+  --muted: #6e7a72;
+  --coral: #d4573b;
+  --coral-soft: #fbeae3;
+  --amber: #b57a17;
+  --amber-soft: #faf0dc;
+  --green: #3f7d3a;
+  --green-soft: #e7f1e2;
+  --ai: #4a3e8f;
+  --ai-soft: #eceaf8;
+
+  --font-display: "Fraunces", serif;
+  --font-ui: "Instrument Sans", sans-serif;
+
+  /* --- Additive design-system extensions (visual-polish pass) ---
+   * Not part of the Section 2 verbatim block above; a spacing / radius /
+   * elevation / motion scale layered on top of the existing palette and
+   * fonts. No new colors, no font changes. */
+
+  /* Darker variants used for hover/active states and stronger text-on-tint
+   * contexts — derived from the existing hues, not new colors. */
+  --evergreen-dark: #083a2f;
+  --coral-deep: #a83c26;
+  --amber-deep: #8a5c0f;
+  --green-deep: #2c5c29;
+  --ai-deep: #362f6b;
+
+  /* 4px base spacing scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* Border-radius scale */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
+
+  /* Elevation: one consistent soft-shadow approach used for all raised
+   * surfaces (cards, sheets, modals), plus a hairline border used together
+   * with it. */
+  --shadow-sm: 0 1px 2px rgba(20, 38, 31, 0.06), 0 1px 1px rgba(20, 38, 31, 0.04);
+  --shadow-md: 0 4px 16px rgba(20, 38, 31, 0.08), 0 1px 2px rgba(20, 38, 31, 0.06);
+  --shadow-lg: 0 12px 32px rgba(20, 38, 31, 0.12), 0 2px 6px rgba(20, 38, 31, 0.06);
+
+  /* Motion: subtle, fast, consistent easing */
+  --ease-standard: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --duration-fast: 150ms;
+  --duration-base: 220ms;
+  --duration-slow: 320ms;
+}
+
+/* Respect prefers-reduced-motion everywhere: collapse all durations so any
+ * transition/animation authored with the tokens above becomes instant. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0.01ms;
+    --duration-base: 0.01ms;
+    --duration-slow: 0.01ms;
+  }
+}

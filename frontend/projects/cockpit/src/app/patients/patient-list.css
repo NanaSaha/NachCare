@@ -1,0 +1,85 @@
+.list-shell {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6) var(--space-12);
+  font-family: var(--font-ui);
+  color: var(--ink);
+}
+
+.list-shell h1 {
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  margin-bottom: var(--space-5);
+}
+
+.patient-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.patient-list a {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: var(--ink);
+  font-weight: 500;
+  box-shadow: var(--shadow-sm);
+  transition: background var(--duration-fast) var(--ease-standard), transform var(--duration-fast) var(--ease-standard);
+}
+
+.patient-list a:hover {
+  background: var(--evergreen-soft);
+  transform: translateX(2px);
+}
+
+.sort-toggle {
+  margin-bottom: var(--space-4);
+  padding: 0.45rem 1.05rem;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--card);
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--evergreen-deep);
+  transition: border-color var(--duration-fast) var(--ease-standard);
+}
+
+.sort-toggle:hover {
+  border-color: var(--evergreen);
+}
+
+/* UC-25: TRENDS, not raw scores — a direction badge only. */
+.risk-trend {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.25rem 0.7rem;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+.risk-trend--rising {
+  color: var(--coral-deep);
+  background: var(--coral-soft);
+}
+
+.risk-trend--stable {
+  color: var(--muted);
+  background: var(--evergreen-soft);
+}
+
+.risk-trend--improving {
+  color: var(--green-deep);
+  background: var(--green-soft);
+}

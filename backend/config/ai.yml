@@ -1,0 +1,63 @@
+# AI gateway configuration (Section 6, M5). Provider *selection* is
+# Rails-env-keyed rather than purely ENV-keyed — see ADR-0007: dev/test
+# default to the network-free StubProvider so the pipeline is fully
+# exercisable with zero credentials; production reads real provider
+# choice from ENV (LLM_PRIMARY_PROVIDER/LLM_FALLBACK_PROVIDER), matching
+# docs/SUBPROCESSORS.md. AI_PROVIDER_OVERRIDE forces a provider in any
+# environment (e.g. to smoke-test real Bedrock creds from a dev checkout).
+default: &default
+  timeouts_ms:
+    assistant: 6000
+    brief: 20000
+    triage: 20000
+    callnote: 20000
+    report: 20000
+    translate: 20000
+    ai_watch_rationale: 20000
+    # Short like `assistant` (interactive tap-to-explain on Home, caregiver
+    # is waiting), not the batch-style 20s budget the drafting tasks get.
+    explain_care_plan_item: 6000
+  retry_count: 1
+  embedding_dim: 1024
+  similarity_threshold: 0.75
+  retrieval_top_k: 6
+
+development:
+  <<: *default
+  providers:
+    # Real Gemini API as primary (ADR-0014, product-owner request) — chosen
+    # over `anthropic` (also registered, available via AI_PROVIDER_OVERRIDE
+    # if the Anthropic account's billing gets sorted out later) because
+    # Gemini has a real embeddings endpoint, so retrieval can use real
+    # semantic similarity instead of always falling back to the stub's
+    # crude feature-hashing. `stub` stays as fallback for both chat and
+    # embed either way — always-available safety net.
+    primary: gemini
+    fallback: stub
+  # Calibrated for real Gemini embeddings (gemini-embedding-001, now the
+  # primary provider's #embed — ADR-0014), NOT the stub's crude
+  # feature-hashing (that was the previous 0.3 here, back when `primary`
+  # was `stub`). Empirically measured cosine similarity against the
+  # seeded demo knowledge base's real embeddings: in-scope queries
+  # ("can she eat restaurant food", "low-salt snacks", "short walks")
+  # scored 0.696-0.796 against their best-matching doc; clearly off-topic
+  # queries ("weather tomorrow", "who won the football match") scored
+  # 0.457-0.487. 0.55 sits with real margin on both sides of that gap.
+  # The 0.75 production default (real Bedrock/Azure embeddings, untested
+  # against this KB) is left alone. If this environment ever falls back
+  # to stub-only #embed (no GEMINI_API_KEY), 0.55 is too strict for the
+  # stub's much lower absolute scale — revert to 0.3 in that case.
+  similarity_threshold: 0.55
+
+test:
+  <<: *default
+  providers:
+    primary: stub
+    fallback: stub
+  similarity_threshold: 0.3
+
+production:
+  <<: *default
+  providers:
+    primary: bedrock_anthropic
+    fallback: azure_openai

@@ -1,0 +1,23 @@
+<main class="trends-shell" data-testid="trends-page">
+  <a routerLink="/home" class="back-link">{{ 'trends.back' | translate }}</a>
+  <h1>{{ 'trends.title' | translate }}</h1>
+
+  @if (loading()) {
+    <p>{{ 'trends.loading' | translate }}</p>
+  } @else {
+    <section class="trend-card">
+      <h2>{{ 'trends.weight.title' | translate }}</h2>
+      <lib-trend-chart [points]="weightPoints()" data-testid="weight-trend-chart" />
+    </section>
+
+    <section class="trend-card">
+      <h2>{{ 'trends.symptoms.title' | translate }}</h2>
+      <lib-trend-chart [points]="symptomPoints()" data-testid="symptom-trend-chart" />
+    </section>
+
+    <section class="trend-card">
+      <h2>{{ 'trends.adherence.title' | translate }}</h2>
+      <lib-trend-chart [points]="adherencePoints()" data-testid="adherence-trend-chart" />
+    </section>
+  }
+</main>

@@ -1,0 +1,278 @@
+{
+  "severity": {
+    "green": "Alles gut",
+    "yellow": "Braucht Aufmerksamkeit",
+    "red": "Dringend"
+  },
+  "languageNames": {
+    "en": "English",
+    "de": "Deutsch",
+    "tr": "Türkçe",
+    "ru": "Русский",
+    "ar": "العربية"
+  },
+  "auth": {
+    "title": "NachCare AI Cockpit",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "otpAttempt": "Authenticator-Code (falls aktiviert)",
+    "signIn": "Anmelden",
+    "signingIn": "Anmeldung läuft…",
+    "signInFailed": "E-Mail, Passwort oder Code falsch."
+  },
+  "enrollment": {
+    "title": "Patient aufnehmen",
+    "patientSection": "Patient",
+    "initials": "Initialen",
+    "birthYear": "Geburtsjahr",
+    "nyhaClass": "NYHA-Klasse",
+    "caregiverSection": "Hauptpflegeperson",
+    "displayName": "Name",
+    "relationship": "Beziehung zum Patienten",
+    "language": "Bevorzugte Sprache",
+    "medicationsSection": "Aktuelle Medikamente",
+    "medicationSearchPlaceholder": "Medikament suchen oder eingeben",
+    "removeMedication": "Medikament entfernen",
+    "submit": "Patient aufnehmen",
+    "submitting": "Wird aufgenommen…",
+    "submitFailed": "Etwas ist schiefgelaufen. Bitte Formular prüfen und erneut versuchen.",
+    "successTitle": "Patient aufgenommen",
+    "codeLabel": "Geben Sie diesen Aktivierungscode an die Pflegeperson weiter:",
+    "expires": "Läuft ab",
+    "downloadPdf": "Druckbares Codeblatt herunterladen",
+    "enrollAnother": "Weiteren Patienten aufnehmen"
+  },
+  "nav": {
+    "triage": "Triage",
+    "patients": "Patienten",
+    "enroll": "Aufnehmen",
+    "analytics": "Analysen",
+    "riskModel": "Risikomodell"
+  },
+  "nurseAlerts": {
+    "bellLabel": "Benachrichtigungen zur Angehörigen-Aktivität",
+    "title": "Neueste Angehörigen-Aktivität",
+    "empty": "In dieser Sitzung noch keine Benachrichtigungen.",
+    "item": {
+      "check_in": "hat einen Check-in übermittelt",
+      "caregiver_message": "hat ein Status-Update gesendet",
+      "dose": {
+        "taken": "hat eine Dosis als eingenommen markiert",
+        "missed": "hat eine Dosis als ausgelassen markiert"
+      }
+    }
+  },
+  "triage": {
+    "title": "Triage-Warteschlange",
+    "loading": "Wird geladen…",
+    "empty": "Keine Meldungen vorhanden.",
+    "back": "← Zurück",
+    "kpi": {
+      "open": "Offen",
+      "inProgress": "In Bearbeitung",
+      "red": "Rot",
+      "yellow": "Gelb",
+      "breached": "SLA überschritten",
+      "aiWatch": "KI-Beobachtung"
+    },
+    "filters": {
+      "all": "Alle",
+      "open": "Offen",
+      "inProgress": "In Bearbeitung",
+      "resolved": "Erledigt"
+    },
+    "state": {
+      "open": "Offen",
+      "in_progress": "In Bearbeitung",
+      "resolved": "Erledigt"
+    },
+    "slaMinutes": "Min. verbleibend",
+    "slaBreached": "SLA überschritten",
+    "detail": {
+      "trend": "Gewichtsverlauf",
+      "noCheckIns": "Keine Check-ins in den letzten 14 Tagen.",
+      "firedRules": "Auswertungen",
+      "interventions": "Maßnahmen",
+      "takeAction": "Maßnahme ergreifen",
+      "outcome": "Ergebnis",
+      "note": "Notiz",
+      "markInProgress": "Als in Bearbeitung markieren",
+      "markResolved": "Als erledigt markieren",
+      "copilot": {
+        "title": "KI-Vorschlag",
+        "loading": "Vorschlag wird erstellt…",
+        "unavailable": "Derzeit kein KI-Vorschlag verfügbar.",
+        "useDraft": "Diesen Entwurf verwenden",
+        "refresh": "Neu generieren"
+      },
+      "conversation": {
+        "title": "Assistent-Verlauf",
+        "loading": "Wird geladen…",
+        "empty": "Noch kein Assistent-Verlauf.",
+        "caregiverRole": "Pflegeperson",
+        "assistantRole": "Assistent",
+        "citedFrom": "Quelle:",
+        "routedBadge": "An Pflegeteam weitergeleitet",
+        "emergencyBadge": "Notfall erkannt"
+      }
+    },
+    "aiWatch": {
+      "badge": "KI-Beobachtung",
+      "sectionTitle": "KI-Beobachtung (prädiktiv — Pflegekraft-Prüfung)",
+      "rationale": {
+        "title": "Warum dieser Verlauf"
+      },
+      "actions": {
+        "title": "Entscheidung der Pflegekraft",
+        "acceptAndWatch": "Annehmen & beobachten (Beobachtung verschärfen)",
+        "acceptAndIntervene": "Annehmen & eingreifen",
+        "dismiss": "Verwerfen (Fehlalarm)"
+      }
+    }
+  },
+  "bridgeArc": {
+    "dayLabel": "Tag {{day}} von {{total}}",
+    "crossedLabel": "Du hast die Brücke überquert",
+    "caption": "90-tägige Genesungsreise",
+    "crossedCaption": "90 Tage, vollständig überquert",
+    "dayAria": "Fortschritt der Genesungsreise: Tag {{day}} von {{total}}",
+    "crossedAria": "Genesungsreise abgeschlossen — die Brücke ist vollständig überquert"
+  },
+  "patients": {
+    "title": "Patienten",
+    "birthYear": "Geboren",
+    "graduation": {
+      "title": "Programmstatus",
+      "status": "Status:",
+      "graduate": "Patient abschließen",
+      "graduating": "Wird abgeschlossen…",
+      "graduatedAt": "Abgeschlossen:",
+      "reportTitle": "Tag-90-Bericht",
+      "notEligible": "Abschluss ist ab Tag 90 der Episode möglich.",
+      "failed": "Abschluss fehlgeschlagen. Bitte erneut versuchen."
+    },
+    "carePlan": {
+      "title": "Behandlungsplan",
+      "draftNotice": "Dieser Behandlungsplan wurde noch nicht gespeichert/aktiviert — füllen Sie die Felder unten aus und speichern Sie, um die erste aktive Version zu erstellen.",
+      "dietRules": "Ernährungsregeln",
+      "careInstructions": "Pflegeanweisungen für zuhause & allgemeiner Behandlungsplan",
+      "careInstructionsPlaceholder": "Der vollständige Versorgungsplan zuhause — Tagesablauf, Hinweise zur Medikamenteneinnahme, Aktivitäts-/Ruheempfehlungen, Warnzeichen, wann das Pflegeteam zu kontaktieren ist…",
+      "thresholds": "Klinische Schwellenwerte (JSON)",
+      "thresholdsGated": "[PLACEHOLDER_CLINICAL: nur Ärzt:innen dürfen klinische Schwellenwerte bearbeiten — FR-N8]",
+      "save": "Speichern",
+      "medications": "Medikamente",
+      "noMedications": "Noch keine Medikamente hinterlegt.",
+      "critical": "kritisch",
+      "addTime": "+ Uhrzeit hinzufügen",
+      "removeTime": "Uhrzeit entfernen",
+      "doseInstructions": "Dosierungshinweis",
+      "doseInstructionsPlaceholder": "z. B. 1 Tablette mit dem Essen",
+      "medicationName": "Medikamentenname",
+      "medicationNamePlaceholder": "z. B. Bisoprolol",
+      "addMedication": "+ Medikament hinzufügen",
+      "removeMedication": "Medikament entfernen",
+      "medicationNameRequired": "Jedes Medikament benötigt einen Namen, bevor Sie speichern können.",
+      "saveSchedules": "Medikamentenplan speichern",
+      "saving": "Wird gespeichert…",
+      "scheduleSaveFailed": "Medikamentenplan konnte nicht gespeichert werden. Bitte erneut versuchen.",
+      "invalidJson": "Das ist kein gültiges JSON.",
+      "saveFailed": "Konnte nicht gespeichert werden. Bitte erneut versuchen."
+    },
+    "activity": {
+      "title": "Aktuelle Pflegeaktivitäten",
+      "empty": "Noch keine Aktivität der Pflegeperson.",
+      "checkIn": "Check-in übermittelt",
+      "dose": {
+        "taken": "Dosis eingenommen",
+        "missed": "Dosis verpasst",
+        "pending": "Dosis ausstehend"
+      }
+    },
+    "messages": {
+      "title": "Nachrichten",
+      "empty": "Noch keine Nachrichten.",
+      "template": "Vorlage",
+      "freeText": "Freitext",
+      "templates": {
+        "checkin_reminder": "Check-in-Erinnerung",
+        "thank_you": "Danke",
+        "low_salt_day": "Low-salt day",
+        "track_fluids_1_5l": "Track fluids: 1.5 L",
+        "elevate_legs_photo": "Elevate legs + photo",
+        "call_nurse_now": "[PLACEHOLDER_CLINICAL: call-nurse-now copy]"
+      },
+      "body": "Nachricht",
+      "language": "Sprache der Pflegeperson",
+      "preview": "Vorschau",
+      "previewing": "Vorschau wird geladen…",
+      "previewFailed": "Vorschau konnte nicht geladen werden. Bitte erneut versuchen.",
+      "translatedReview": "Vor dem Senden prüfen",
+      "notTranslated": "Übersetzung derzeit nicht verfügbar — bitte manuell schreiben, bevor Sie senden.",
+      "send": "Senden",
+      "sending": "Wird gesendet…",
+      "sendFailed": "Konnte nicht gesendet werden. Bitte erneut versuchen."
+    },
+    "sortByRiskTrend": "Nach Risikotrend sortieren",
+    "sortDefault": "Standardreihenfolge",
+    "riskTrend": {
+      "rising": "Steigend",
+      "stable": "Stabil",
+      "improving": "Verbessernd"
+    },
+    "cadence": {
+      "title": "Vorschlag zur Check-in-Häufigkeit",
+      "direction": {
+        "taper": "Schlägt seltenere Check-ins vor",
+        "densify": "Schlägt häufigere Check-ins vor"
+      },
+      "approve": "Genehmigen",
+      "dismiss": "Verwerfen"
+    }
+  },
+  "analytics": {
+    "title": "Analysen",
+    "subtitle": "Pilot-Kennzahlen für Ihren Standort — nur aggregierte Zahlen, keine patientenbezogenen Details.",
+    "from": "Von",
+    "to": "Bis",
+    "apply": "Anwenden",
+    "loadFailed": "Pilot-Kennzahlen konnten nicht geladen werden. Bitte erneut versuchen.",
+    "exportCsv": "CSV exportieren",
+    "exportPdf": "PDF exportieren",
+    "exporting": "Wird exportiert…",
+    "footnote": "Eine Kennzahl zeigt —, wenn für diesen Zeitraum noch nicht genug Daten vorliegen.",
+    "metrics": {
+      "checkinAdherence": "Check-in-Treue",
+      "slaCompliance": "SLA-Einhaltung bei ROT-Meldungen",
+      "timeToAction": "Reaktionszeit bei ROT-Meldungen (Median)",
+      "completion": "Programmabschluss (Tag 90)",
+      "safetyRouting": "Sicherheits-Weiterleitungsrate des Assistenten"
+    }
+  },
+  "riskModel": {
+    "title": "Risikomodell (Schatten / Freigabe)",
+    "disclaimer": "Heuristischer Verlaufs-Score — ein MVP-Platzhalter, kein validierter klinischer Prädiktor. Siehe ADR-0012.",
+    "promoted": "Freigegeben — KI-Beobachtung ist für diesen Standort aktiv",
+    "shadowMode": "Schattenmodus — KI-Beobachtung wird noch niemandem angezeigt",
+    "gates": {
+      "title": "Freigabekriterien",
+      "insufficientData": "Noch nicht genug Daten, um die Kriterien zu bewerten — in einer frischen Dev/Demo-Umgebung erwartet.",
+      "leadTime": "Früher erkannt als die Regeln (Median)",
+      "days": "Tage",
+      "samples": "Stichproben",
+      "alertRate": "Alarmrate pro Check-in",
+      "checkins": "Check-ins",
+      "missedReds": "Verpasste Rot-Alarme",
+      "overallMet": "Alle Kriterien erfüllt",
+      "overallNotMet": "Kriterien nicht erfüllt"
+    },
+    "promote": {
+      "title": "Freigabeentscheidung",
+      "overrideLabel": "Trotzdem freigeben (Dev/Demo-Override — in der Produktion sind echte, kriterienerfüllende Daten erforderlich)",
+      "promoteButton": "Freigeben",
+      "promoteOverrideButton": "Trotzdem freigeben (Override)"
+    },
+    "history": {
+      "title": "Entscheidungsverlauf"
+    }
+  }
+}

@@ -1,0 +1,46 @@
+@if (visible()) {
+  @if (moreOpen()) {
+    <button
+      type="button"
+      class="more-backdrop"
+      (click)="closeMore()"
+      [attr.aria-label]="'nav.closeMore' | translate"
+      data-testid="bottom-nav-more-backdrop"
+    ></button>
+    <div class="more-sheet" data-testid="bottom-nav-more-sheet">
+      <a routerLink="/care-tasks" (click)="closeMore()" data-testid="nav-care-tasks">{{ 'nav.careTasks' | translate }}</a>
+      <a routerLink="/learn" (click)="closeMore()" data-testid="nav-learn">{{ 'nav.learn' | translate }}</a>
+      <a routerLink="/care-team" (click)="closeMore()" data-testid="nav-care-team">{{ 'nav.careTeam' | translate }}</a>
+    </div>
+  }
+
+  <nav class="bottom-nav" data-testid="bottom-nav" aria-label="Main navigation">
+    <a routerLink="/home" routerLinkActive="active" class="bottom-nav__item" data-testid="nav-home">
+      <span class="bottom-nav__icon" aria-hidden="true">🏠</span>
+      <span class="bottom-nav__label">{{ 'nav.home' | translate }}</span>
+    </a>
+    <a routerLink="/care-plan" routerLinkActive="active" class="bottom-nav__item" data-testid="nav-care-plan">
+      <span class="bottom-nav__icon" aria-hidden="true">📋</span>
+      <span class="bottom-nav__label">{{ 'nav.carePlan' | translate }}</span>
+    </a>
+    <a routerLink="/trends" routerLinkActive="active" class="bottom-nav__item" data-testid="nav-trends">
+      <span class="bottom-nav__icon" aria-hidden="true">📈</span>
+      <span class="bottom-nav__label">{{ 'nav.trends' | translate }}</span>
+    </a>
+    <a routerLink="/assistant" routerLinkActive="active" class="bottom-nav__item" data-testid="nav-assistant">
+      <span class="bottom-nav__icon" aria-hidden="true">✦</span>
+      <span class="bottom-nav__label">{{ 'nav.assistant' | translate }}</span>
+    </a>
+    <button
+      type="button"
+      class="bottom-nav__item bottom-nav__item--button"
+      [class.active]="moreOpen()"
+      (click)="toggleMore()"
+      [attr.aria-expanded]="moreOpen()"
+      data-testid="nav-more"
+    >
+      <span class="bottom-nav__icon" aria-hidden="true">⋯</span>
+      <span class="bottom-nav__label">{{ 'nav.more' | translate }}</span>
+    </button>
+  </nav>
+}

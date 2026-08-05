@@ -1,0 +1,106 @@
+/* Global base styles — caregiver PWA. Layered on top of
+ * projects/shared/styles/{tokens,fonts}.css (loaded before this file, see
+ * angular.json). Mobile-first: this app is primarily used on a phone. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  /* min-height, not height: with the global box-sizing: border-box
+     above, a fixed `height: 100%` caps body's box at the viewport
+     height, so its own padding-bottom (added below, reserving room for
+     the fixed bottom nav) gets silently absorbed inside that cap
+     instead of adding real extra scrollable space once page content
+     already fills/overflows the viewport — min-height lets body grow
+     past 100% when content + the reserved padding actually need it. */
+  min-height: 100%;
+}
+
+:root {
+  /* Product-owner feedback item #3: the fixed bottom tab bar's own
+   * content height (app/nav/bottom-nav.css sets a matching fixed
+   * `height` on `.bottom-nav__item` using this same variable) — shared
+   * here so every other layer that needs to reserve or offset around
+   * the bar (body's padding-bottom below, the explain panel and "More"
+   * sheet's bottom offset) can never drift out of sync with it again.
+   * (A real bug caught by live browser testing, not just a screenshot:
+   * an earlier hardcoded 56px reservation was shorter than the bar's
+   * actual rendered height once a wrapped two-line label pushed it
+   * taller, which silently made the check-in "back" button unclickable
+   * — covered, not removed, by the fixed bar sitting on top of it.) */
+  --bottom-nav-h: 76px;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* Reserves room for the fixed bottom tab bar so page content is never
+   * hidden behind it. Harmless extra whitespace on the pre-auth
+   * activate/onboarding screens, where the bar itself doesn't render. */
+  padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px));
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0;
+  color: var(--evergreen-deep);
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font-family: var(--font-ui);
+}
+
+input,
+textarea,
+select {
+  font-family: var(--font-ui);
+  color: var(--ink);
+}
+
+/* One consistent focus treatment app-wide, visible on keyboard nav only. */
+:focus-visible {
+  outline: 2.5px solid var(--evergreen);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+::selection {
+  background: var(--evergreen-soft);
+  color: var(--evergreen-deep);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

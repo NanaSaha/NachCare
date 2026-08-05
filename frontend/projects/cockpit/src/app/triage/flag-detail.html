@@ -1,0 +1,171 @@
+<main class="detail-shell">
+  <button type="button" class="back-link" (click)="back()">{{ 'triage.back' | translate }}</button>
+
+  @if (loading()) {
+    <p>{{ 'triage.loading' | translate }}</p>
+  } @else if (flag(); as f) {
+    <header class="detail-header">
+      @if (f.subtype === 'ai_watch') {
+        <span class="ai-watch-badge" data-testid="ai-watch-badge">✦ {{ 'triage.aiWatch.badge' | translate }}</span>
+      } @else {
+        <lib-severity-indicator [level]="asSeverity(f.severity)" />
+      }
+      <h1>{{ f.patient.pseudonym_code }} ({{ f.patient.initials }})</h1>
+    </header>
+
+    <section class="trend" data-testid="trend-chart">
+      <h2>{{ 'triage.detail.trend' | translate }}</h2>
+      @if (f.check_in_history.length > 0) {
+        <svg viewBox="0 0 300 80" class="sparkline" preserveAspectRatio="none">
+          <polyline fill="none" stroke="var(--evergreen)" stroke-width="2" [attr.points]="sparklinePoints()" />
+        </svg>
+        <ul class="checkin-history">
+          @for (ci of f.check_in_history; track ci.id) {
+            <li>
+              {{ ci.effective_date }} — {{ ci.weight_kg ?? '—' }} kg
+              @if (ci.note) {
+                <p class="checkin-note" data-testid="checkin-history-note">{{ ci.note }}</p>
+              }
+              @if (ci.photo_urls.length > 0) {
+                <div class="checkin-photos" data-testid="checkin-history-photos">
+                  @for (url of ci.photo_urls; track url) {
+                    <img [src]="url" class="checkin-photo-thumb" alt="" data-testid="checkin-history-photo-thumb" />
+                  }
+                </div>
+              }
+            </li>
+          }
+        </ul>
+      } @else {
+        <p>{{ 'triage.detail.noCheckIns' | translate }}</p>
+      }
+    </section>
+
+    <section class="evaluations">
+      <h2>{{ 'triage.detail.firedRules' | translate }}</h2>
+      @for (evaluation of f.evaluations; track evaluation.id) {
+        <div class="evaluation-row">
+          <lib-severity-indicator [level]="asSeverity(evaluation.severity)" />
+          <span>{{ evaluation.created_at | date: 'short' }}</span>
+        </div>
+      }
+    </section>
+
+    <section class="interventions" data-testid="interventions">
+      <h2>{{ 'triage.detail.interventions' | translate }}</h2>
+      @for (intervention of f.interventions; track intervention.id) {
+        <div class="intervention-row">
+          <span>{{ intervention.outcome }}</span>
+          <span>{{ intervention.note_final }}</span>
+        </div>
+      }
+    </section>
+
+    <section class="conversation" data-testid="assistant-conversation">
+      <h2>{{ 'triage.detail.conversation.title' | translate }}</h2>
+      @if (conversationLoading()) {
+        <p>{{ 'triage.detail.conversation.loading' | translate }}</p>
+      } @else if (conversationTurns().length === 0) {
+        <p class="empty">{{ 'triage.detail.conversation.empty' | translate }}</p>
+      } @else {
+        <ul class="conversation-turns">
+          @for (turn of conversationTurns(); track turn.id) {
+            <li class="conversation-turn" [class.conversation-turn--assistant]="turn.role === 'assistant'">
+              <strong>{{ (turn.role === 'assistant' ? 'triage.detail.conversation.assistantRole' : 'triage.detail.conversation.caregiverRole') | translate }}:</strong>
+              <span>{{ turn.content }}</span>
+              @if (turn.retrieval_refs.length > 0) {
+                <span class="conversation-turn__citation">{{ 'triage.detail.conversation.citedFrom' | translate }} {{ turn.retrieval_refs.join(', ') }}</span>
+              }
+              @if (turn.routed) {
+                <span class="badge badge--ai">{{ 'triage.detail.conversation.routedBadge' | translate }}</span>
+              }
+              @if (turn.emergency_detected) {
+                <span class="badge badge--emergency">{{ 'triage.detail.conversation.emergencyBadge' | translate }}</span>
+              }
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
+    @if (f.subtype === 'ai_watch' && f.state !== 'resolved') {
+      <!-- UC-23 step 5: COPILOT rationale panel — plain-language top
+           contributing signals, never a bare score. -->
+      <section class="copilot-panel" data-testid="ai-watch-rationale-panel">
+        <h2>✦ {{ 'triage.aiWatch.rationale.title' | translate }}</h2>
+        @if (!aiWatchRationaleRequested()) {
+          <button type="button" (click)="loadAiWatchRationale()" data-testid="request-ai-watch-rationale">
+            {{ 'triage.aiWatch.rationale.title' | translate }}
+          </button>
+        } @else if (aiWatchRationaleLoading()) {
+          <p>{{ 'triage.detail.copilot.loading' | translate }}</p>
+        } @else if (aiWatchRationale(); as rationale) {
+          <p class="copilot-panel__draft" data-testid="ai-watch-rationale-text">{{ rationale }}</p>
+        }
+      </section>
+
+      <!-- UC-23 step 6: three nurse actions, distinct Intervention
+           outcomes on the same flag lifecycle (not a parallel system). -->
+      <section class="action-form" data-testid="ai-watch-actions">
+        <h2>{{ 'triage.aiWatch.actions.title' | translate }}</h2>
+        <label>
+          {{ 'triage.detail.note' | translate }}
+          <textarea [ngModel]="note()" (ngModelChange)="setNote($event)" data-testid="note-input"></textarea>
+        </label>
+
+        <div class="action-buttons">
+          <button type="button" [disabled]="submitting()" (click)="applyWatchOutcome('accept_and_watch')" data-testid="accept-and-watch">
+            {{ 'triage.aiWatch.actions.acceptAndWatch' | translate }}
+          </button>
+          <button type="button" [disabled]="submitting()" (click)="applyWatchOutcome('accept_and_intervene')" data-testid="accept-and-intervene">
+            {{ 'triage.aiWatch.actions.acceptAndIntervene' | translate }}
+          </button>
+          <button type="button" [disabled]="submitting()" (click)="applyWatchOutcome('dismiss_false_positive')" data-testid="dismiss-false-positive">
+            {{ 'triage.aiWatch.actions.dismiss' | translate }}
+          </button>
+        </div>
+      </section>
+    } @else if (f.state !== 'resolved') {
+      <section class="copilot-panel" data-testid="triage-copilot">
+        <h2>✦ {{ 'triage.detail.copilot.title' | translate }}</h2>
+        @if (!triageDraftRequested()) {
+          <button type="button" (click)="loadTriageDraft()" data-testid="request-copilot-draft">
+            {{ 'triage.detail.copilot.title' | translate }}
+          </button>
+        } @else if (triageDraftLoading()) {
+          <p>{{ 'triage.detail.copilot.loading' | translate }}</p>
+        } @else if (triageDraft(); as draft) {
+          <p class="copilot-panel__draft" data-testid="copilot-draft-text">{{ draft }}</p>
+          <button type="button" (click)="useDraft()" data-testid="use-copilot-draft">
+            {{ 'triage.detail.copilot.useDraft' | translate }}
+          </button>
+        } @else {
+          <p class="empty">{{ 'triage.detail.copilot.unavailable' | translate }}</p>
+        }
+      </section>
+
+      <section class="action-form">
+        <h2>{{ 'triage.detail.takeAction' | translate }}</h2>
+        <label>
+          {{ 'triage.detail.outcome' | translate }}
+          <input type="text" [ngModel]="outcome()" (ngModelChange)="outcome.set($event)" data-testid="outcome-input" />
+        </label>
+        <label>
+          {{ 'triage.detail.note' | translate }}
+          <textarea [ngModel]="note()" (ngModelChange)="setNote($event)" data-testid="note-input"></textarea>
+        </label>
+
+        <div class="action-buttons">
+          @if (f.state === 'open') {
+            <button type="button" [disabled]="submitting()" (click)="transition('in_progress')" data-testid="mark-in-progress">
+              {{ 'triage.detail.markInProgress' | translate }}
+            </button>
+          }
+          <button type="button" [disabled]="submitting()" (click)="transition('resolved')" data-testid="mark-resolved">
+            {{ 'triage.detail.markResolved' | translate }}
+          </button>
+        </div>
+      </section>
+    }
+  }
+</main>

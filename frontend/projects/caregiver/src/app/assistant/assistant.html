@@ -1,0 +1,83 @@
+<main class="assistant-page">
+  <header class="assistant-header">
+    <button type="button" class="back-button" (click)="back()">{{ 'onboarding.back' | translate }}</button>
+    <h1>{{ 'assistant.title' | translate }}</h1>
+  </header>
+
+  @if (anyEmergency()) {
+    <lib-emergency-block />
+  }
+
+  @if (loading()) {
+    <p>{{ 'checkin.loading' | translate }}</p>
+  } @else {
+    <div class="turns" data-testid="assistant-turns">
+      @if (turns().length === 0) {
+        <p class="empty">{{ 'assistant.empty' | translate }}</p>
+      }
+
+      @for (turn of turns(); track turn.id) {
+        <div class="turn" [class.turn--caregiver]="turn.role === 'caregiver'" [class.turn--assistant]="turn.role === 'assistant'"
+          [attr.data-testid]="'turn-' + turn.id">
+          <p class="turn__content">{{ turn.content }}</p>
+
+          @if (turn.role === 'assistant') {
+            @if (turn.retrieval_refs.length > 0) {
+              <p class="turn__citation" data-testid="turn-citation">
+                {{ 'assistant.citedFrom' | translate }} {{ turn.retrieval_refs.join(', ') }}
+              </p>
+            }
+
+            @if (turn.routed) {
+              <p class="turn__chip turn__chip--routed" data-testid="turn-routed-chip">
+                {{ 'assistant.routedChip' | translate }}
+              </p>
+            }
+
+            @if (turn.emergency_detected) {
+              <p class="turn__chip turn__chip--emergency">
+                {{ 'assistant.emergencyNotice' | translate }}
+              </p>
+            }
+
+            @if (!turn.routed) {
+              @if (escalatedTurnIds().has(turn.id)) {
+                <p class="turn__chip turn__chip--routed" data-testid="turn-escalated-chip">
+                  {{ 'assistant.escalated' | translate }}
+                </p>
+              } @else {
+                <button
+                  type="button"
+                  class="escalate-button"
+                  [disabled]="escalatingTurnId() === turn.id"
+                  (click)="escalate(turn)"
+                  data-testid="escalate-button"
+                >
+                  {{ (escalatingTurnId() === turn.id ? 'assistant.escalating' : 'assistant.escalate') | translate }}
+                </button>
+              }
+            }
+          }
+        </div>
+      }
+    </div>
+
+    @if (error()) {
+      <p class="error" role="alert">{{ error() | translate }}</p>
+    }
+
+    <form class="composer" (ngSubmit)="send()">
+      <input
+        type="text"
+        [ngModel]="draft()"
+        (ngModelChange)="draft.set($event)"
+        name="message"
+        [placeholder]="'assistant.placeholder' | translate"
+        data-testid="assistant-input"
+      />
+      <button type="submit" [disabled]="sending() || !draft().trim()" data-testid="assistant-send">
+        {{ (sending() ? 'assistant.sending' : 'assistant.send') | translate }}
+      </button>
+    </form>
+  }
+</main>

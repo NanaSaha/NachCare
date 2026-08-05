@@ -1,0 +1,56 @@
+<main class="analytics-shell">
+  <h1>{{ 'analytics.title' | translate }}</h1>
+  <p class="subtitle">{{ 'analytics.subtitle' | translate }}</p>
+
+  <form class="range-form" (ngSubmit)="reload()" data-testid="range-form">
+    <label>
+      {{ 'analytics.from' | translate }}
+      <input type="date" [(ngModel)]="from" name="from" data-testid="range-from" />
+    </label>
+    <label>
+      {{ 'analytics.to' | translate }}
+      <input type="date" [(ngModel)]="to" name="to" data-testid="range-to" />
+    </label>
+    <button type="submit" data-testid="range-apply">{{ 'analytics.apply' | translate }}</button>
+  </form>
+
+  @if (loading()) {
+    <p>{{ 'triage.loading' | translate }}</p>
+  } @else if (error()) {
+    <p class="error" data-testid="analytics-error">{{ 'analytics.loadFailed' | translate }}</p>
+  } @else if (metrics(); as m) {
+    <div class="kpi-header" data-testid="pilot-metrics">
+      <div class="kpi">
+        <span class="kpi-value">{{ asPercent(m.checkin_adherence_rate) }}</span>
+        <span class="kpi-label">{{ 'analytics.metrics.checkinAdherence' | translate }}</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-value">{{ asPercent(m.red_flag_sla_compliance_rate) }}</span>
+        <span class="kpi-label">{{ 'analytics.metrics.slaCompliance' | translate }}</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-value">{{ asMinutes(m.red_flag_median_time_to_first_action_minutes) }}</span>
+        <span class="kpi-label">{{ 'analytics.metrics.timeToAction' | translate }}</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi-value">{{ asPercent(m.program_completion_rate) }}</span>
+        <span class="kpi-label">{{ 'analytics.metrics.completion' | translate }}</span>
+      </div>
+      <div class="kpi kpi--ai">
+        <span class="kpi-value">{{ asPercent(m.assistant_safety_routing_rate) }}</span>
+        <span class="kpi-label">{{ 'analytics.metrics.safetyRouting' | translate }}</span>
+      </div>
+    </div>
+
+    <div class="exports">
+      <button type="button" (click)="export('csv')" [disabled]="exporting() !== null" data-testid="export-csv">
+        {{ exporting() === 'csv' ? ('analytics.exporting' | translate) : ('analytics.exportCsv' | translate) }}
+      </button>
+      <button type="button" (click)="export('pdf')" [disabled]="exporting() !== null" data-testid="export-pdf">
+        {{ exporting() === 'pdf' ? ('analytics.exporting' | translate) : ('analytics.exportPdf' | translate) }}
+      </button>
+    </div>
+
+    <p class="footnote">{{ 'analytics.footnote' | translate }}</p>
+  }
+</main>

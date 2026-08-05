@@ -1,0 +1,37 @@
+# Sidekiq-cron schedule. Times are in the `cron` field's server timezone
+# (config.time_zone / TZ env — set to Europe/Berlin in production so 23:59
+# means 23:59 local, matching Section 7's "23:59 missed-check-in scan").
+missed_checkin_scan:
+  cron: "59 23 * * *"
+  class: "MissedCheckinScanJob"
+  description: "R-8: nightly scan for episodes with no check-in today"
+
+sla_watch:
+  cron: "*/5 * * * *"
+  class: "SlaWatchJob"
+  description: "Marks open/in_progress flags breached once their SLA deadline passes"
+
+push_confirm_watch:
+  cron: "* * * * *"
+  class: "PushConfirmWatchJob"
+  description: "RED chain: escalates to SMS after 5 min with no push-confirm beacon"
+
+daily_reminder:
+  cron: "*/10 * * * *"
+  class: "DailyReminderJob"
+  description: "Sends a check-in reminder push at each caregiver's notification_time"
+
+dose_reminder:
+  cron: "*/10 * * * *"
+  class: "DoseReminderJob"
+  description: "Sends a generic reminder push for each medication scheduled-dose time not yet marked taken/missed"
+
+weekly_digest:
+  cron: "0 7 * * 1"
+  class: "WeeklyDigestJob"
+  description: "Mails trailing-7-day pilot metrics to each site's site_admin/physician staff (Monday 07:00)"
+
+ai_watch_expiry:
+  cron: "*/15 * * * *"
+  class: "AiWatchExpiryJob"
+  description: "UC-23 A2: auto-closes open AI WATCH flags 'resolved-uneventful' after 5 days with no escalation/nurse action"

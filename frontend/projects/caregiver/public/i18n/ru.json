@@ -1,0 +1,238 @@
+{
+  "severity": {
+    "green": "All good",
+    "yellow": "Needs attention",
+    "red": "Urgent"
+  },
+  "languageNames": {
+    "en": "English",
+    "de": "Deutsch",
+    "tr": "Türkçe",
+    "ru": "Русский",
+    "ar": "العربية"
+  },
+  "activation": {
+    "title": "Activate NachCare AI",
+    "intro": "Enter the 8-character code from the sheet your nurse gave you.",
+    "codeLabel": "Activation code",
+    "activate": "Activate",
+    "activating": "Activating…",
+    "failed": "That code didn't work. Check it and try again, or ask your nurse for a new one."
+  },
+  "onboarding": {
+    "continue": "Continue",
+    "back": "Back",
+    "finish": "Finish setup",
+    "finishing": "Finishing…",
+    "failed": "Something went wrong saving your settings. Please try again.",
+    "language": {
+      "title": "Choose your language"
+    },
+    "consents": {
+      "title": "Before we start",
+      "a": "[PLACEHOLDER_CLINICAL: consent A legal text — pending legal review, docs/OPEN_DECISIONS.md #1]",
+      "b": "[PLACEHOLDER_CLINICAL: consent B legal text — pending legal review, docs/OPEN_DECISIONS.md #1]",
+      "c": "[PLACEHOLDER_CLINICAL: consent C legal text — pending legal review, docs/OPEN_DECISIONS.md #1]",
+      "d": "[PLACEHOLDER_CLINICAL: consent D legal text — pending legal review, docs/OPEN_DECISIONS.md #1]"
+    },
+    "notificationTime": {
+      "title": "Daily check-in reminder",
+      "intro": "What time works best for your daily check-in reminder?"
+    },
+    "pin": {
+      "title": "Set a 4-digit PIN",
+      "intro": "This locks the app if it's been idle for 15 minutes."
+    },
+    "orientation": {
+      "title": "Quick orientation",
+      "videoPlaceholder": "[PLACEHOLDER: orientation video]"
+    }
+  },
+  "checkin": {
+    "loading": "Loading…",
+    "weight": {
+      "title": "Today's weight",
+      "lastWeight": "Last check-in:",
+      "confirmDelta": "That's a big change since your last check-in. Is this weight correct?",
+      "reenter": "Re-enter",
+      "confirmYes": "Yes, that's correct"
+    },
+    "medications": {
+      "title": "Medications today",
+      "none": "No medications on file yet."
+    },
+    "symptoms": {
+      "title": "How is she feeling today?",
+      "breathlessAtRest": "Breathless at rest",
+      "swelling_increased": "[PLACEHOLDER_CLINICAL: swelling/edema question wording]",
+      "fatigue_increased": "[PLACEHOLDER_CLINICAL: fatigue question wording]"
+    },
+    "note": {
+      "title": "In your own words, how is she feeling today?",
+      "placeholder": "Anything else worth telling the care team, in your own words (optional)"
+    },
+    "photo": {
+      "title": "Add a photo or video (optional)",
+      "remove": "Remove"
+    },
+    "submit": "Submit check-in",
+    "submitting": "Submitting…",
+    "result": {
+      "title": "Today's result",
+      "brief": {
+        "green": "[PLACEHOLDER_CLINICAL: green result brief copy]",
+        "yellow": "[PLACEHOLDER_CLINICAL: yellow result brief copy]",
+        "red": "[PLACEHOLDER_CLINICAL: red result brief copy]"
+      },
+      "notified": {
+        "yellow": "Care team notified",
+        "red": "Care team notified urgently"
+      },
+      "queued": "No connection right now — this check-in will be sent as soon as you're back online."
+    },
+    "messages": {
+      "title": "Messages from your care team",
+      "empty": "No messages yet."
+    },
+    "aiWatch": {
+      "badge": "AI Watch",
+      "message": "This week's check-in pattern suggests keeping a closer eye.",
+      "nothingWrong": "Nothing is wrong today — your care team is just watching a little more closely.",
+      "actionsTitle": "Three small things for the next 3 days:",
+      "action1": "Continue your daily check-in as usual.",
+      "action2": "Keep taking medications as scheduled.",
+      "action3": "Let your care team know if anything changes."
+    },
+    "back": "Back"
+  },
+  "home": {
+    "nurseTasksTitle": "From your nurse",
+    "nurseTasksEmpty": "Nothing from your nurse yet.",
+    "nurseTasksInstructions": "Home care instructions",
+    "nurseTasksDiet": "Diet",
+    "tapToExplain": "Tap to understand why",
+    "explainLoading": "Getting an explanation…",
+    "explainError": "Couldn't load an explanation right now. Ask your nurse if you'd like more detail.",
+    "closeExplain": "Close explanation"
+  },
+  "bridgeArc": {
+    "dayLabel": "Day {{day}} of {{total}}",
+    "crossedLabel": "You crossed the bridge",
+    "caption": "Your 90-day recovery journey",
+    "crossedCaption": "90 days, fully crossed",
+    "dayAria": "Recovery journey progress: day {{day}} of {{total}}",
+    "crossedAria": "Recovery journey complete — the bridge is fully crossed"
+  },
+  "emergencyBlock": {
+    "title": "If this is a medical emergency",
+    "call": "Call 112",
+    "note": "This always works, even if the app or assistant is unavailable."
+  },
+  "assistant": {
+    "entry": "Ask the assistant",
+    "title": "Assistant",
+    "placeholder": "Type your question…",
+    "send": "Send",
+    "sending": "Sending…",
+    "unavailable": "The assistant isn't available right now.",
+    "empty": "Ask about today's check-in or general caregiving questions.",
+    "citedFrom": "Source:",
+    "routedChip": "✦ Sent to your care team",
+    "emergencyNotice": "✦ Your care team has also been notified",
+    "escalate": "Ask a nurse instead",
+    "escalating": "Sending…",
+    "escalated": "✓ Sent to your nurse",
+    "error": "Something went wrong. Please try again."
+  },
+  "nav": {
+    "home": "Home",
+    "carePlan": "Care instructions",
+    "careTasks": "Today's tasks",
+    "trends": "Trends",
+    "learn": "Learn",
+    "careTeam": "Care team",
+    "assistant": "Assistant",
+    "more": "More",
+    "closeMore": "Close menu"
+  },
+  "trendChart": {
+    "noData": "Not enough data yet"
+  },
+  "trends": {
+    "back": "Back",
+    "title": "Your trends",
+    "loading": "Loading…",
+    "weight": {
+      "title": "Weight"
+    },
+    "symptoms": {
+      "title": "Symptoms logged"
+    },
+    "adherence": {
+      "title": "Medication adherence"
+    }
+  },
+  "learn": {
+    "back": "Back",
+    "title": "Learn",
+    "loading": "Loading…",
+    "empty": "Nothing here yet.",
+    "lockedTitle": "Unlocks in week {{week}}",
+    "markComplete": "Mark as read",
+    "completed": "Completed"
+  },
+  "carePlan": {
+    "back": "Back",
+    "title": "Your care instructions",
+    "loading": "Loading…",
+    "empty": "Your nurse hasn't added care instructions yet.",
+    "voicePlay": "🔊 Read aloud",
+    "voiceStop": "⏹ Stop",
+    "voiceUnsupported": "Voice playback isn't available on this device.",
+    "instructionsTitle": "How to care for her at home",
+    "dietTitle": "Diet",
+    "medicationsTitle": "Medications",
+    "critical": "critical",
+    "at": "at",
+    "noSchedule": "No schedule set yet.",
+    "spokenIntro": "Your care instructions:",
+    "spokenDiet": "Diet:",
+    "spokenMedicationsIntro": "Medications:",
+    "spokenAt": "at",
+    "spokenNoTimes": "no scheduled times yet"
+  },
+  "careTasks": {
+    "back": "Back",
+    "title": "Today's care tasks",
+    "loading": "Loading…",
+    "empty": "No scheduled medication times today.",
+    "critical": "critical",
+    "markTaken": "Mark taken",
+    "markMissed": "Mark missed",
+    "markFailed": "Couldn't save that. Please try again.",
+    "status": {
+      "pending": "Pending",
+      "taken": "Taken",
+      "missed": "Missed"
+    }
+  },
+  "careTeam": {
+    "back": "Back",
+    "title": "Care team",
+    "siteInfoUnavailable": "Care team details aren't available right now — the emergency options above still work.",
+    "messageHint": "Messages from your care team also appear on the check-in screen.",
+    "language": {
+      "title": "App language"
+    },
+    "update": {
+      "title": "Send an update to your care team",
+      "placeholder": "Share how she's doing, in your own words (optional if you're attaching a photo or video)",
+      "mediaLabel": "Add a photo or video (optional)",
+      "removeMedia": "Remove",
+      "send": "Send update",
+      "sending": "Sending…",
+      "sent": "Sent — your care team will see this.",
+      "sendFailed": "Couldn't send. Please try again."
+    }
+  }
+}

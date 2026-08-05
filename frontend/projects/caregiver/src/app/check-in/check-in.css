@@ -1,0 +1,728 @@
+.checkin-shell {
+  max-width: 480px;
+  margin: 0 auto;
+  width: 100%;
+  /* Bottom clearance for the fixed bottom nav is body's job (styles.css,
+     --bottom-nav-h) now that one exists app-wide — this shell no longer
+     needs its own large reserve on top of that (a doubled-up, and still
+     insufficient on its own, reserve was exactly how the check-in "back"
+     button ended up hidden under the nav; caught via live browser
+     testing, not just a screenshot). */
+  padding: var(--space-5) var(--space-4) var(--space-5);
+  font-family: var(--font-ui);
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.checkin-shell h1 {
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+  letter-spacing: -0.01em;
+}
+
+.checkin-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-16) var(--space-4);
+  color: var(--muted);
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 3px solid var(--evergreen-soft);
+  border-top-color: var(--evergreen);
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.checkin-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.checkin-topbar .back {
+  padding: var(--space-2) 0;
+}
+
+.care-plan-entry {
+  display: inline-block;
+  padding: 0.55em 1em;
+  border-radius: var(--radius-pill);
+  background: var(--evergreen-soft);
+  color: var(--evergreen-deep);
+  border: 1px solid var(--line);
+  text-align: center;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.85rem;
+  transition: background var(--duration-fast) var(--ease-standard), transform var(--duration-fast) var(--ease-standard);
+}
+
+.care-plan-entry:hover {
+  background: var(--evergreen);
+  color: #fff;
+}
+
+.care-plan-entry:active {
+  transform: scale(0.97);
+}
+
+.home-bridge-arc {
+  animation: fade-up var(--duration-slow) var(--ease-standard) both;
+}
+
+/* Mobile: nurse tasks (left column in the DOM) simply stack above the
+ * questionnaire, same as before this was wrapped in a grid container —
+ * .checkin-columns__nurse is empty except on the first step anyway. */
+.checkin-columns {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.checkin-columns__nurse:empty {
+  display: none;
+}
+
+/* Large screens: side by side, nurse tasks left / questionnaire right,
+ * per product-owner request. The shell widens to fit two real columns
+ * instead of stretching the single mobile column thin. */
+@media (min-width: 900px) {
+  .checkin-shell {
+    max-width: 960px;
+  }
+
+  .checkin-columns {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--space-6);
+  }
+
+  .checkin-columns__nurse {
+    flex: 0 0 360px;
+    /* Sticky so it stays visible while the questionnaire on the right
+     * scrolls through its steps (it's the "alongside" part of the
+     * request, not just a same-screen coincidence on step 1). */
+    position: sticky;
+    top: var(--space-5);
+  }
+
+  .checkin-columns__wizard {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
+
+.progress {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: center;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--line);
+  transition: background var(--duration-base) var(--ease-standard), transform var(--duration-base) var(--ease-standard);
+}
+
+.dot.active {
+  background: var(--evergreen);
+  transform: scale(1.35);
+}
+
+.dot.done {
+  background: var(--green);
+}
+
+.step-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6) var(--space-5);
+  box-shadow: var(--shadow-sm);
+  animation: fade-up var(--duration-base) var(--ease-standard) both;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.trend-chip {
+  display: inline-block;
+  background: var(--evergreen-soft);
+  color: var(--evergreen-deep);
+  border-radius: var(--radius-pill);
+  padding: 0.3rem 0.85rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  width: fit-content;
+}
+
+.weight-input {
+  padding: var(--space-5) var(--space-4);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-md);
+  font-size: 2.5rem;
+  font-family: var(--font-display);
+  text-align: center;
+  color: var(--evergreen-deep);
+  background: var(--paper);
+  transition: border-color var(--duration-fast) var(--ease-standard);
+}
+
+.weight-input:focus-visible {
+  border-color: var(--evergreen);
+}
+
+.confirm-dialog {
+  border: 1.5px solid var(--amber);
+  background: var(--amber-soft);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  color: var(--amber-deep);
+}
+
+.confirm-dialog__actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.confirm-dialog__actions .btn {
+  flex: 1;
+}
+
+.toggle-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.med-toggle,
+.symptom-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  background: var(--paper);
+  transition: border-color var(--duration-fast) var(--ease-standard), background var(--duration-fast) var(--ease-standard);
+}
+
+.med-toggle--off {
+  color: var(--muted);
+}
+
+.symptom-toggle.breathless {
+  border-color: var(--coral);
+  background: var(--coral-soft);
+  font-weight: 500;
+}
+
+.symptom-toggle--on:not(.breathless) {
+  border-color: var(--evergreen);
+  background: var(--evergreen-soft);
+}
+
+/* Custom switch control, replacing the bare checkbox. Still a real
+ * <input type="checkbox"> underneath (data-testid + change events
+ * untouched) so nothing about behavior or test hooks changes. */
+.switch {
+  appearance: none;
+  width: 2.5rem;
+  height: 1.5rem;
+  border-radius: var(--radius-pill);
+  background: var(--line);
+  position: relative;
+  cursor: pointer;
+  flex: none;
+  transition: background var(--duration-fast) var(--ease-standard);
+}
+
+.switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--duration-fast) var(--ease-standard);
+}
+
+.switch:checked {
+  background: var(--evergreen);
+}
+
+.switch:checked::after {
+  transform: translateX(1rem);
+}
+
+.switch--coral:checked {
+  background: var(--coral);
+}
+
+textarea {
+  min-height: 130px;
+  padding: var(--space-4);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-md);
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  resize: vertical;
+  background: var(--paper);
+  transition: border-color var(--duration-fast) var(--ease-standard);
+}
+
+textarea:focus-visible {
+  border-color: var(--evergreen);
+}
+
+.empty-note {
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* --- Buttons --- */
+.btn {
+  padding: 0.9rem 1.25rem;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-standard), transform var(--duration-fast) var(--ease-standard), box-shadow var(--duration-fast) var(--ease-standard);
+}
+
+.btn--block {
+  width: 100%;
+}
+
+.btn--primary {
+  background: var(--evergreen);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: var(--evergreen-deep);
+}
+
+.btn--primary:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1.5px solid var(--line);
+}
+
+.btn--ghost:hover {
+  border-color: var(--muted);
+}
+
+.btn:disabled {
+  background: var(--line);
+  color: var(--muted);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Legacy selector kept for any button not covered by the .btn classes above. */
+button:disabled {
+  cursor: not-allowed;
+}
+
+.error {
+  color: var(--coral);
+  font-weight: 500;
+}
+
+/* --- Result screen --- */
+.result-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-5);
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--line);
+  background: var(--card);
+  box-shadow: var(--shadow-md);
+  animation: reveal var(--duration-slow) var(--ease-standard) both;
+}
+
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(10px) scale(0.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.result-card__eyebrow {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.result-card--green {
+  background: linear-gradient(180deg, var(--green-soft) 0%, var(--card) 55%);
+  border-color: var(--green);
+}
+
+.result-card--yellow {
+  background: linear-gradient(180deg, var(--amber-soft) 0%, var(--card) 55%);
+  border-color: var(--amber);
+}
+
+/* RED: the emergency block inside is the visually dominant element — this
+ * card itself stays comparatively restrained so the 112 block reads as
+ * unmistakably different from a normal alert, per R4. */
+.result-card--red {
+  background: linear-gradient(180deg, var(--coral-soft) 0%, var(--card) 40%);
+  border-color: var(--coral);
+  border-width: 2px;
+}
+
+.result-card--queued {
+  background: var(--paper);
+  border-style: dashed;
+  color: var(--muted);
+}
+
+.notified-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  margin: 0;
+  padding: 0.3rem 0.8rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.notified-chip--yellow {
+  background: var(--amber-soft);
+  color: var(--amber-deep);
+}
+
+.notified-chip--red {
+  background: var(--coral-soft);
+  color: var(--coral-deep);
+}
+
+.result-card .brief {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+.result-card lib-emergency-block {
+  width: 100%;
+  margin-top: var(--space-2);
+}
+
+/* UC-23 step 4: calm, non-alarming, deliberately AI-purple — never the
+   coral/amber alert treatment used for real (rules-driven) flags. No SLA
+   or urgency framing anywhere in this card. */
+.ai-watch-card {
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--ai);
+  background: var(--ai-soft);
+  animation: fade-up var(--duration-slow) var(--ease-standard) both;
+}
+
+.ai-watch-card__badge {
+  margin: 0 0 var(--space-2);
+  font-weight: 700;
+  color: var(--ai);
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.ai-watch-card__message,
+.ai-watch-card__nothingWrong {
+  margin: 0 0 var(--space-2);
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.ai-watch-card__actionsTitle {
+  margin: var(--space-3) 0 var(--space-2);
+  font-weight: 600;
+  color: var(--ai-deep);
+}
+
+.ai-watch-card__actions {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.messages {
+  border-top: 1px solid var(--line);
+  padding-top: var(--space-4);
+}
+
+.messages h2 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  margin-bottom: var(--space-2);
+}
+
+.messages ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.messages li {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+}
+
+.messages .empty {
+  color: var(--muted);
+  font-style: italic;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.assistant-entry {
+  display: block;
+  padding: 0.85em 1em;
+  border-radius: var(--radius-md);
+  background: var(--ai-soft);
+  color: var(--ai);
+  border: 1px solid var(--ai);
+  text-align: center;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background var(--duration-fast) var(--ease-standard);
+}
+
+.assistant-entry:hover {
+  background: var(--ai);
+  color: #fff;
+}
+
+/* Feedback #2 back-button — mirrors onboarding.css's .back. */
+.back {
+  align-self: center;
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-weight: 500;
+  padding: var(--space-2);
+}
+
+.back:hover {
+  color: var(--evergreen-deep);
+}
+
+/* Feedback #1: nurse's tasks/meds/notes, tap to explain. */
+.nurse-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  animation: fade-up var(--duration-base) var(--ease-standard) both;
+}
+
+.nurse-tasks h2 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+}
+
+.nurse-task-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.nurse-task-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  width: 100%;
+  padding: var(--space-4);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--ease-standard), background var(--duration-fast) var(--ease-standard);
+}
+
+.nurse-task-item:hover {
+  border-color: var(--evergreen);
+  background: var(--evergreen-soft);
+}
+
+.nurse-task-item__label {
+  font-weight: 600;
+  color: var(--evergreen-deep);
+}
+
+.nurse-task-item__time {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.nurse-task-item__note {
+  /* Clips long nurse-authored free text to 2 lines — full text shown in the explain panel. */
+  font-size: 0.9rem;
+  color: var(--ink);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.nurse-task-item__cta {
+  margin-top: var(--space-1);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ai);
+}
+
+.explain-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(20, 38, 31, 0.35);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.explain-panel {
+  position: fixed;
+  left: var(--space-4);
+  right: var(--space-4);
+  bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + var(--space-4));
+  z-index: 51;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: var(--space-5);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  box-shadow: var(--shadow-lg);
+  animation: reveal var(--duration-base) var(--ease-standard) both;
+}
+
+.explain-panel h3 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  padding-right: var(--space-6);
+}
+
+.explain-panel__close {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: var(--muted);
+  cursor: pointer;
+  padding: var(--space-2);
+}
+
+.explain-panel__close:hover {
+  color: var(--ink);
+}
+
+.explain-panel__loading {
+  color: var(--muted);
+}
+
+.explain-panel__error {
+  color: var(--coral);
+  font-weight: 500;
+}
+
+/* AI-purple, reserved for AI-generated content only (Section 2). */
+.explain-panel__text--ai {
+  color: var(--ai-deep);
+  background: var(--ai-soft);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+}
+
+.photo-attach {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.photo-attach-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--evergreen-deep);
+}
+
+.photo-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.photo-preview img,
+.photo-preview video {
+  max-width: 100%;
+  max-height: 220px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-bridge-arc,
+  .step-card,
+  .result-card,
+  .ai-watch-card {
+    animation: none;
+  }
+}

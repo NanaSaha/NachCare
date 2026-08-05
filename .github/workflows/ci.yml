@@ -1,0 +1,138 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# SBOM generation (Section 2's full CI list) is deferred until there's a
+# release artifact worth attesting — a job with nothing to attest would be
+# CI theater. Playwright e2e landed in M1 (e2e/tests/enrollment.spec.ts).
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: nachcare
+          POSTGRES_PASSWORD: nachcare
+          POSTGRES_DB: nachcare_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U nachcare"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      RAILS_ENV: test
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: nachcare
+      POSTGRES_PASSWORD: nachcare
+      REDIS_URL: redis://localhost:6379/0
+      COVERAGE: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+          working-directory: backend
+
+      - name: Rubocop
+        run: bin/rubocop -f github
+
+      - name: Brakeman (static security analysis)
+        run: bundle exec brakeman --no-pager -i config/brakeman.ignore
+
+      - name: bundler-audit (dependency vulnerabilities)
+        run: |
+          bundle exec bundler-audit check --update
+
+      - name: Load schema
+        run: bin/rails db:schema:load
+
+      - name: RSpec (fails if app/domain coverage < 85%, see spec/spec_helper.rb)
+        run: bundle exec rspec
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint (caregiver, cockpit, shared)
+        run: |
+          npx ng lint caregiver
+          npx ng lint cockpit
+          npx ng lint shared
+
+      - name: Unit tests (caregiver, cockpit, shared)
+        run: |
+          npx ng test shared --watch=false --browsers=ChromeHeadless
+          npx ng test caregiver --watch=false --browsers=ChromeHeadless
+          npx ng test cockpit --watch=false --browsers=ChromeHeadless
+
+      - name: npm audit (dependency vulnerabilities)
+        run: npm audit --audit-level=high
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install frontend dependencies (needed for ng serve)
+        working-directory: frontend
+        run: npm ci
+
+      - name: Install e2e dependencies
+        working-directory: e2e
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: e2e
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright e2e specs
+        working-directory: e2e
+        run: npm test
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: e2e/playwright-report/
+          retention-days: 14

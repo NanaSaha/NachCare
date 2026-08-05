@@ -1,0 +1,82 @@
+<main class="risk-model-shell">
+  <h1>{{ 'riskModel.title' | translate }}</h1>
+  <p class="disclaimer" data-testid="risk-model-disclaimer">{{ 'riskModel.disclaimer' | translate }}</p>
+
+  @if (loading()) {
+    <p>{{ 'triage.loading' | translate }}</p>
+  } @else if (status(); as s) {
+    <section class="status-card" data-testid="risk-model-status">
+      @if (s.promoted) {
+        <p class="promoted-badge" data-testid="promoted-badge">✦ {{ 'riskModel.promoted' | translate }}</p>
+      } @else {
+        <p class="shadow-badge" data-testid="shadow-badge">{{ 'riskModel.shadowMode' | translate }}</p>
+      }
+    </section>
+
+    <section class="gates" data-testid="gate-evaluation">
+      <h2>{{ 'riskModel.gates.title' | translate }}</h2>
+
+      @if (s.gate_evaluation.insufficient_data) {
+        <p class="insufficient-data" data-testid="insufficient-data-notice">{{ 'riskModel.gates.insufficientData' | translate }}</p>
+      }
+
+      <div class="gate-row" [class.gate-met]="s.gate_evaluation.detection_lead_time_met" data-testid="gate-lead-time">
+        <span>{{ 'riskModel.gates.leadTime' | translate }}</span>
+        <span>
+          {{ s.gate_evaluation.detection_lead_time_median_days ?? '—' }} {{ 'riskModel.gates.days' | translate }}
+          ({{ s.gate_evaluation.detection_lead_time_sample_size }} {{ 'riskModel.gates.samples' | translate }})
+        </span>
+      </div>
+
+      <div class="gate-row" [class.gate-met]="s.gate_evaluation.alert_rate_met" data-testid="gate-alert-rate">
+        <span>{{ 'riskModel.gates.alertRate' | translate }}</span>
+        <span>{{ asPercent(s.gate_evaluation.alert_rate_per_patient_day) }} ({{ s.gate_evaluation.alert_rate_sample_checkins }} {{ 'riskModel.gates.checkins' | translate }})</span>
+      </div>
+
+      <div class="gate-row" [class.gate-met]="s.gate_evaluation.missed_reds_met" data-testid="gate-missed-reds">
+        <span>{{ 'riskModel.gates.missedReds' | translate }}</span>
+        <span>{{ s.gate_evaluation.missed_reds_count }} / {{ s.gate_evaluation.missed_reds_total_reds }}</span>
+      </div>
+
+      <p class="overall" data-testid="gate-overall">
+        {{ (s.gate_evaluation.overall_met ? 'riskModel.gates.overallMet' : 'riskModel.gates.overallNotMet') | translate }}
+      </p>
+    </section>
+
+    @if (!s.promoted && canPromote()) {
+      <section class="promote-form" data-testid="promote-form">
+        <h2>{{ 'riskModel.promote.title' | translate }}</h2>
+
+        @if (!s.gate_evaluation.overall_met) {
+          <label class="override-check">
+            <input type="checkbox" [checked]="overrideChecked()" (change)="overrideChecked.set(!overrideChecked())" data-testid="override-checkbox" />
+            {{ 'riskModel.promote.overrideLabel' | translate }}
+          </label>
+        }
+
+        <button
+          type="button"
+          [disabled]="promoting() || (!s.gate_evaluation.overall_met && !overrideChecked())"
+          (click)="promote()"
+          data-testid="promote-button"
+        >
+          {{ (s.gate_evaluation.overall_met ? 'riskModel.promote.promoteButton' : 'riskModel.promote.promoteOverrideButton') | translate }}
+        </button>
+      </section>
+    }
+
+    @if (s.history.length > 0) {
+      <section class="history" data-testid="promotion-history">
+        <h2>{{ 'riskModel.history.title' | translate }}</h2>
+        <ul>
+          @for (record of s.history; track record.id) {
+            <li>
+              v{{ record.version }} — {{ record.promoted ? 'promoted' : 'declined' }}{{ record.override ? ' (override)' : '' }}
+              — {{ record.created_at | date: 'short' }}
+            </li>
+          }
+        </ul>
+      </section>
+    }
+  }
+</main>

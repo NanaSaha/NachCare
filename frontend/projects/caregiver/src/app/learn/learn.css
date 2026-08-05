@@ -1,0 +1,126 @@
+.learn-shell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6) var(--space-4) var(--space-12);
+  max-width: 480px;
+  margin: 0 auto;
+  font-family: var(--font-ui);
+  color: var(--ink);
+}
+
+.back-link {
+  color: var(--evergreen-deep);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  align-self: flex-start;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+h1 {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  margin: 0;
+}
+
+.learn-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.learn-item {
+  background: var(--card);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--duration-fast) var(--ease-standard), transform var(--duration-fast) var(--ease-standard);
+  animation: fade-up var(--duration-base) var(--ease-standard) both;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.learn-item:not(.locked):hover {
+  border-color: var(--evergreen);
+}
+
+.learn-item:not(.locked):active {
+  transform: scale(0.995);
+}
+
+.learn-item.locked {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.learn-item.completed {
+  border-color: var(--green);
+  background: var(--green-soft);
+}
+
+.learn-item__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.learn-item__title {
+  font-weight: 600;
+}
+
+.learn-item__badge {
+  background: var(--green);
+  color: #fff;
+  border-radius: var(--radius-pill);
+  padding: 0.2em 0.75em;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex: none;
+}
+
+.learn-item__body {
+  margin-top: var(--space-3);
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.learn-item__body + button {
+  margin-top: var(--space-3);
+  padding: 0.6em 1.1em;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--evergreen);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-standard);
+}
+
+.learn-item__body + button:hover {
+  background: var(--evergreen-deep);
+}
+
+.empty {
+  color: var(--muted);
+  text-align: center;
+  padding: var(--space-6) 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .learn-item {
+    animation: none;
+  }
+}

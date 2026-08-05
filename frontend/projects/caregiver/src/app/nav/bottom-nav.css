@@ -1,0 +1,106 @@
+.bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  display: flex;
+  justify-content: space-around;
+  align-items: stretch;
+  background: var(--card);
+  border-top: 1px solid var(--line);
+  box-shadow: var(--shadow-md);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.bottom-nav__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-1);
+  /* Fixed, not min-height: a long translated label (e.g. EN "Care
+     instructions") must never grow the bar taller than every other
+     layer (body padding, sheet/panel offsets) assumes it is — see the
+     shared --bottom-nav-h rationale in styles.css. */
+  height: var(--bottom-nav-h);
+  overflow: hidden;
+  text-decoration: none;
+  color: var(--muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-ui);
+}
+
+.bottom-nav__icon {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.bottom-nav__label {
+  font-size: 0.7rem;
+  font-weight: 500;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bottom-nav__item.active,
+.bottom-nav__item[aria-expanded='true'] {
+  color: var(--evergreen);
+}
+
+.bottom-nav__item:hover {
+  color: var(--evergreen-deep);
+}
+
+.more-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 39;
+  background: rgba(20, 38, 31, 0.25);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.more-sheet {
+  position: fixed;
+  right: var(--space-4);
+  bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + var(--space-2));
+  z-index: 41;
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.more-sheet a {
+  padding: var(--space-3) var(--space-4);
+  text-decoration: none;
+  color: var(--ink);
+  font-weight: 500;
+  border-bottom: 1px solid var(--line);
+}
+
+.more-sheet a:last-child {
+  border-bottom: none;
+}
+
+.more-sheet a:hover {
+  background: var(--evergreen-soft);
+  color: var(--evergreen-deep);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bottom-nav__item {
+    transition: none;
+  }
+}

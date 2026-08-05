@@ -1,0 +1,105 @@
+<main class="enroll-shell">
+  <h1>{{ 'enrollment.title' | translate }}</h1>
+
+  @if (result(); as r) {
+    <section class="result" data-testid="enrollment-result">
+      <h2>{{ 'enrollment.successTitle' | translate }}</h2>
+      <p>{{ 'enrollment.codeLabel' | translate }}</p>
+      <p class="code" data-testid="activation-code">{{ r.activation_code.code }}</p>
+      <p class="expiry">{{ 'enrollment.expires' | translate }} {{ r.activation_code.expires_at | date: 'mediumDate' }}</p>
+
+      <div class="actions">
+        <button type="button" (click)="downloadCodeSheet()">{{ 'enrollment.downloadPdf' | translate }}</button>
+        <button type="button" class="secondary" (click)="enrollAnother()">{{ 'enrollment.enrollAnother' | translate }}</button>
+      </div>
+    </section>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <fieldset>
+        <legend>{{ 'enrollment.patientSection' | translate }}</legend>
+
+        <label>
+          {{ 'enrollment.initials' | translate }}
+          <input type="text" formControlName="initials" data-testid="initials" />
+        </label>
+
+        <label>
+          {{ 'enrollment.birthYear' | translate }}
+          <input type="number" inputmode="numeric" formControlName="birthYear" data-testid="birth-year" />
+        </label>
+
+        <label>
+          {{ 'enrollment.nyhaClass' | translate }}
+          <select formControlName="nyhaClass" data-testid="nyha-class">
+            @for (nyha of nyhaClasses; track nyha) {
+              <option [value]="nyha">{{ nyha }}</option>
+            }
+          </select>
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>{{ 'enrollment.caregiverSection' | translate }}</legend>
+
+        <label>
+          {{ 'enrollment.displayName' | translate }}
+          <input type="text" formControlName="displayName" data-testid="display-name" />
+        </label>
+
+        <label>
+          {{ 'enrollment.relationship' | translate }}
+          <input type="text" formControlName="relationship" data-testid="relationship" />
+        </label>
+
+        <label>
+          {{ 'enrollment.language' | translate }}
+          <select formControlName="language" data-testid="language">
+            @for (lang of languages; track lang) {
+              <option [value]="lang">{{ lang.toUpperCase() }}</option>
+            }
+          </select>
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>{{ 'enrollment.medicationsSection' | translate }}</legend>
+
+        <div class="chips">
+          @for (med of medications(); track med) {
+            <span class="chip">
+              {{ med }}
+              <button type="button" (click)="removeMedication(med)" [attr.aria-label]="'enrollment.removeMedication' | translate">×</button>
+            </span>
+          }
+        </div>
+
+        <input
+          type="text"
+          [value]="medicationQuery()"
+          (input)="onMedicationQueryChange($any($event.target).value)"
+          (keydown.enter)="$event.preventDefault(); addMedication(medicationQuery())"
+          [placeholder]="'enrollment.medicationSearchPlaceholder' | translate"
+          data-testid="medication-search"
+        />
+
+        @if (medicationMatches().length > 0) {
+          <ul class="matches">
+            @for (drug of medicationMatches(); track drug.id) {
+              <li>
+                <button type="button" (click)="addMedication(drug.name)">{{ drug.name }}</button>
+              </li>
+            }
+          </ul>
+        }
+      </fieldset>
+
+      @if (error()) {
+        <p class="error" role="alert">{{ error() | translate }}</p>
+      }
+
+      <button type="submit" [disabled]="form.invalid || submitting()" data-testid="submit-enrollment">
+        {{ (submitting() ? 'enrollment.submitting' : 'enrollment.submit') | translate }}
+      </button>
+    </form>
+  }
+</main>

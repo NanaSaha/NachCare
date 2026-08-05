@@ -1,0 +1,312 @@
+<main class="detail-shell">
+  <a routerLink="/patients" class="back-link">{{ 'triage.back' | translate }}</a>
+
+  @if (loading()) {
+    <p>{{ 'triage.loading' | translate }}</p>
+  } @else if (patient(); as p) {
+    <h1>{{ p.pseudonym_code }} ({{ p.initials }})</h1>
+    <p class="meta">{{ 'patients.birthYear' | translate }} {{ p.birth_year }} · NYHA {{ p.nyha_class }}</p>
+
+    @if (currentEpisode(); as episode) {
+      <section class="graduation" data-testid="graduation-section">
+        <h2>{{ 'patients.graduation.title' | translate }}</h2>
+
+        @if (programDay(); as day) {
+          <lib-bridge-arc [currentDay]="day" [totalDays]="90" />
+        }
+
+        <p class="episode-status" data-testid="episode-status">{{ 'patients.graduation.status' | translate }} {{ episode.status }}</p>
+
+        @if (episode.status === 'graduated') {
+          <p class="graduated-note" data-testid="graduated-note">
+            {{ 'patients.graduation.graduatedAt' | translate }} {{ episode.milestones.graduated_at | date: 'medium' }}
+          </p>
+          @if (episode.milestones.graduation_report) {
+            <details class="report" data-testid="graduation-report">
+              <summary>{{ 'patients.graduation.reportTitle' | translate }}</summary>
+              <p>{{ episode.milestones.graduation_report }}</p>
+            </details>
+          }
+        } @else if (episode.eligible_for_graduation) {
+          <button type="button" [disabled]="graduating()" (click)="graduate()" data-testid="graduate-button">
+            {{ (graduating() ? 'patients.graduation.graduating' : 'patients.graduation.graduate') | translate }}
+          </button>
+        } @else {
+          <p class="not-eligible" data-testid="graduation-not-eligible">{{ 'patients.graduation.notEligible' | translate }}</p>
+        }
+
+        @if (graduateError()) {
+          <p class="error" role="alert">{{ graduateError() | translate }}</p>
+        }
+      </section>
+    }
+
+    <!-- UC-24: post-promotion-only. Renders nothing pre-promotion or with
+         no signal to propose (backend returns an empty list). -->
+    @if (pendingCadenceProposal; as proposal) {
+      <section class="cadence-proposal" data-testid="cadence-proposal">
+        <h2>✦ {{ 'patients.cadence.title' | translate }}</h2>
+        <p class="cadence-direction" data-testid="cadence-direction">
+          {{ ('patients.cadence.direction.' + proposal.direction) | translate }}
+        </p>
+        <p class="cadence-rationale">{{ proposal.rationale }}</p>
+        <div class="cadence-actions">
+          <button type="button" [disabled]="cadenceDeciding()" (click)="approveCadenceProposal(proposal)" data-testid="cadence-approve">
+            {{ 'patients.cadence.approve' | translate }}
+          </button>
+          <button type="button" [disabled]="cadenceDeciding()" (click)="dismissCadenceProposal(proposal)" data-testid="cadence-dismiss">
+            {{ 'patients.cadence.dismiss' | translate }}
+          </button>
+        </div>
+      </section>
+    }
+
+    @if (p.episodes[0]?.care_plan; as plan) {
+      <section class="care-plan">
+        <h2>{{ 'patients.carePlan.title' | translate }} (v{{ plan.version }})</h2>
+
+        @if (!plan.active) {
+          <p class="draft-notice" data-testid="care-plan-draft-notice">{{ 'patients.carePlan.draftNotice' | translate }}</p>
+        }
+
+        <label>
+          {{ 'patients.carePlan.dietRules' | translate }}
+          <textarea [ngModel]="dietRules()" (ngModelChange)="dietRules.set($event)" data-testid="diet-rules-input"></textarea>
+        </label>
+        <button type="button" [disabled]="saving()" (click)="saveDietRules()" data-testid="save-diet-rules">
+          {{ 'patients.carePlan.save' | translate }}
+        </button>
+
+        <label>
+          {{ 'patients.carePlan.careInstructions' | translate }}
+          <textarea
+            [ngModel]="careInstructions()"
+            (ngModelChange)="careInstructions.set($event)"
+            [placeholder]="'patients.carePlan.careInstructionsPlaceholder' | translate"
+            data-testid="care-instructions-input"
+          ></textarea>
+        </label>
+        <button type="button" [disabled]="saving()" (click)="saveCareInstructions()" data-testid="save-care-instructions">
+          {{ 'patients.carePlan.save' | translate }}
+        </button>
+
+        @if (canEditThresholds()) {
+          <label>
+            {{ 'patients.carePlan.thresholds' | translate }}
+            <textarea class="json-editor" [ngModel]="thresholdsJson()" (ngModelChange)="thresholdsJson.set($event)" data-testid="thresholds-input"></textarea>
+          </label>
+          <button type="button" [disabled]="saving()" (click)="saveThresholds()" data-testid="save-thresholds">
+            {{ 'patients.carePlan.save' | translate }}
+          </button>
+        } @else {
+          <p class="physician-gated">{{ 'patients.carePlan.thresholdsGated' | translate }}</p>
+        }
+
+        @if (error()) {
+          <p class="error" role="alert">{{ error() | translate }}</p>
+        }
+
+        <h3>{{ 'patients.carePlan.medications' | translate }}</h3>
+
+        @if (medicationDrafts().length === 0) {
+          <p class="muted">{{ 'patients.carePlan.noMedications' | translate }}</p>
+        }
+
+        <ul class="medication-schedule-list" data-testid="medication-schedule-list">
+          @for (med of medicationDrafts(); track med.id) {
+            <li class="medication-schedule-item" [attr.data-testid]="'medication-schedule-' + med.id">
+              <div class="medication-name-row">
+                <label class="medication-name-field">
+                  {{ 'patients.carePlan.medicationName' | translate }}
+                  <input
+                    type="text"
+                    [ngModel]="med.name"
+                    (ngModelChange)="updateName(med.id, $event)"
+                    [placeholder]="'patients.carePlan.medicationNamePlaceholder' | translate"
+                    [attr.data-testid]="'med-name-' + med.id"
+                  />
+                </label>
+
+                <label class="medication-critical-field">
+                  <input
+                    type="checkbox"
+                    [checked]="med.critical"
+                    (change)="updateCritical(med.id, !med.critical)"
+                    [attr.data-testid]="'med-critical-' + med.id"
+                  />
+                  {{ 'patients.carePlan.critical' | translate }}
+                </label>
+
+                <button
+                  type="button"
+                  class="remove-medication"
+                  (click)="removeMedication(med.id)"
+                  [attr.data-testid]="'remove-medication-' + med.id"
+                >
+                  {{ 'patients.carePlan.removeMedication' | translate }}
+                </button>
+              </div>
+
+              <div class="time-slots">
+                @for (time of med.times; track $index) {
+                  <div class="time-slot">
+                    <input
+                      type="time"
+                      [ngModel]="time"
+                      (ngModelChange)="updateTime(med.id, $index, $event)"
+                      [attr.data-testid]="'med-time-' + med.id + '-' + $index"
+                    />
+                    <button
+                      type="button"
+                      class="remove-slot"
+                      (click)="removeTimeSlot(med.id, $index)"
+                      [attr.data-testid]="'remove-time-' + med.id + '-' + $index"
+                      [attr.aria-label]="'patients.carePlan.removeTime' | translate"
+                    >
+                      &times;
+                    </button>
+                  </div>
+                }
+                <button type="button" class="add-slot" (click)="addTimeSlot(med.id)" [attr.data-testid]="'add-time-' + med.id">
+                  {{ 'patients.carePlan.addTime' | translate }}
+                </button>
+              </div>
+
+              <label>
+                {{ 'patients.carePlan.doseInstructions' | translate }}
+                <input
+                  type="text"
+                  [ngModel]="med.instructions"
+                  (ngModelChange)="updateInstructions(med.id, $event)"
+                  [placeholder]="'patients.carePlan.doseInstructionsPlaceholder' | translate"
+                  [attr.data-testid]="'med-instructions-' + med.id"
+                />
+              </label>
+            </li>
+          }
+        </ul>
+
+        <button type="button" class="add-medication" (click)="addMedication()" data-testid="add-medication">
+          {{ 'patients.carePlan.addMedication' | translate }}
+        </button>
+
+        @if (medicationDrafts().length > 0) {
+          <button type="button" [disabled]="scheduleSaving() || hasInvalidMedication()" (click)="saveSchedules()" data-testid="save-medication-schedules">
+            {{ (scheduleSaving() ? 'patients.carePlan.saving' : 'patients.carePlan.saveSchedules') | translate }}
+          </button>
+        }
+
+        @if (scheduleError()) {
+          <p class="error" role="alert">{{ scheduleError() | translate }}</p>
+        }
+      </section>
+    }
+
+    <section class="activity-feed" data-testid="recent-activity">
+      <h2>{{ 'patients.activity.title' | translate }}</h2>
+      <ul>
+        @for (item of recentActivity(); track item.type + '-' + item.id) {
+          <li [attr.data-testid]="'activity-' + item.type + '-' + item.id">
+            @if (item.type === 'check_in') {
+              {{ 'patients.activity.checkIn' | translate }}
+              @if (item.weight_kg) { — {{ item.weight_kg }} kg }
+              @if (item.note) {
+                <p class="activity-note" data-testid="activity-note">{{ item.note }}</p>
+              }
+              @if (item.photo_urls && item.photo_urls.length > 0) {
+                <div class="activity-photos" data-testid="activity-photos">
+                  @for (url of item.photo_urls; track url) {
+                    <img [src]="url" class="activity-photo-thumb" alt="" data-testid="activity-photo-thumb" />
+                  }
+                </div>
+              }
+            } @else {
+              {{ 'patients.activity.dose.' + item.status | translate }} — {{ item.medication_name }} ({{ item.scheduled_time }})
+            }
+            <span class="activity-time">{{ item.occurred_at | date: 'medium' }}</span>
+          </li>
+        } @empty {
+          <li class="empty">{{ 'patients.activity.empty' | translate }}</li>
+        }
+      </ul>
+    </section>
+
+    <section class="messages">
+      <h2>{{ 'patients.messages.title' | translate }}</h2>
+
+      <ul class="message-history" data-testid="message-history">
+        @for (m of messages(); track m.id) {
+          <li [attr.data-testid]="'message-' + m.id">
+            <strong>{{ m.sender }}:</strong> {{ m.body_translated || m.body_source }}
+            @if (m.media_url) {
+              @if (m.media_content_type && m.media_content_type.startsWith('video/')) {
+                <video [src]="m.media_url" controls class="message-media" data-testid="message-media-video"></video>
+              } @else {
+                <img [src]="m.media_url" class="message-media" alt="" data-testid="message-media-image" />
+              }
+            }
+          </li>
+        } @empty {
+          <li class="empty">{{ 'patients.messages.empty' | translate }}</li>
+        }
+      </ul>
+
+      <div class="composer">
+        <label>
+          {{ 'patients.messages.template' | translate }}
+          <select [ngModel]="messageTemplateKey()" (ngModelChange)="selectTemplate($event)" data-testid="message-template-select">
+            <option value="">{{ 'patients.messages.freeText' | translate }}</option>
+            @for (key of messageTemplateKeys; track key) {
+              <option [value]="key">{{ 'patients.messages.templates.' + key | translate }}</option>
+            }
+          </select>
+        </label>
+
+        @if (!messageTemplateKey()) {
+          <label>
+            {{ 'patients.messages.body' | translate }}
+            <textarea [ngModel]="messageBodySource()" (ngModelChange)="messageBodySource.set($event)" data-testid="message-body-input"></textarea>
+          </label>
+        }
+
+        <label>
+          {{ 'patients.messages.language' | translate }}
+          <select [ngModel]="messageLanguage()" (ngModelChange)="messageLanguage.set($event)" data-testid="message-language-select">
+            @for (lang of [ 'en', 'de', 'tr', 'ru', 'ar' ]; track lang) {
+              <option [value]="lang">{{ 'languageNames.' + lang | translate }}</option>
+            }
+          </select>
+        </label>
+
+        <button
+          type="button"
+          [disabled]="messagePreviewing() || (!messageTemplateKey() && !messageBodySource())"
+          (click)="previewMessage()"
+          data-testid="message-preview-button"
+        >
+          {{ (messagePreviewing() ? 'patients.messages.previewing' : 'patients.messages.preview') | translate }}
+        </button>
+
+        @if (messagePreview(); as preview) {
+          <div class="preview" data-testid="message-preview">
+            <p class="source">{{ preview.body_source }}</p>
+            <label>
+              {{ 'patients.messages.translatedReview' | translate }}
+              @if (!preview.body_translated) {
+                <p class="not-translated">{{ 'patients.messages.notTranslated' | translate }}</p>
+              }
+              <textarea [ngModel]="messageBodyTranslated()" (ngModelChange)="messageBodyTranslated.set($event)" data-testid="message-translated-input"></textarea>
+            </label>
+            <button type="button" [disabled]="messageSending()" (click)="sendMessage()" data-testid="message-send-button">
+              {{ (messageSending() ? 'patients.messages.sending' : 'patients.messages.send') | translate }}
+            </button>
+          </div>
+        }
+
+        @if (messageError()) {
+          <p class="error" role="alert">{{ messageError() | translate }}</p>
+        }
+      </div>
+    </section>
+  }
+</main>

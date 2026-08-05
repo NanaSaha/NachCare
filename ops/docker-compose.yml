@@ -1,0 +1,123 @@
+name: nachcare
+
+services:
+  postgres:
+    # Must match the major version of the psql/pg_dump client tools baked
+    # into backend/Dockerfile (Debian trixie ships PG17 client tools) —
+    # a client/server version mismatch breaks `db:schema:dump` /
+    # `db:test:prepare` (structure.sql) with "unrecognized configuration
+    # parameter" for GUCs the older server doesn't have.
+    image: pgvector/pgvector:pg17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: nachcare
+      POSTGRES_PASSWORD: nachcare
+      POSTGRES_DB: nachcare_development
+    ports:
+      - "5433:5432"  # 5432 is taken by another project's container on this host
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nachcare"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mailcatcher:
+    image: dockage/mailcatcher:0.9.0
+    restart: unless-stopped
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+
+  # ADR-0001: host has no Ruby 3.3 toolchain and no version manager, so the
+  # Rails backend runs in a container built from ruby:3.3-slim rather than
+  # deviating from the locked stack. Use `docker compose run --rm backend
+  # <cmd>` for one-off rails/bundle/rspec/rubocop invocations.
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    working_dir: /app
+    environment:
+      # Discrete vars, not DATABASE_URL: RAILS_ENV varies per invocation
+      # (development for `server`, test for `rspec`) and each needs a
+      # different database name from the same Postgres instance.
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: nachcare
+      POSTGRES_PASSWORD: nachcare
+      REDIS_URL: redis://redis:6379/0
+      SMTP_HOST: mailcatcher
+      SMTP_PORT: "1025"
+      # ADR-0010 follow-up to ADR-0009 #9: `WEB_CONCURRENCY` used to be
+      # hardcoded to 10 here (M7 load-gate tuning — see ADR-0009 #9 for the
+      # full history/results). `config/puma.rb` documents WEB_CONCURRENCY
+      # as opt-in, "unset outside the load-test invocation leaves this
+      # single-process, matching every other environment unchanged" — but
+      # baking it into this *persistent* service's environment meant every
+      # normal dev/demo run of the standing backend container was
+      # multi-worker, not just the load-test invocation. That silently
+      # broke ActionCable: the `async` pubsub adapter (config/cable.yml)
+      # only delivers a broadcast to WebSocket connections held by the
+      # *same* worker process that called `.broadcast`, so with 10 workers
+      # a live update almost never reaches the client that's actually
+      # subscribed — FlagsChannel's triage-queue live updates and this
+      # phase's new CareActivityChannel both went silently dark. Discovered
+      # while manually verifying "nurse sees realtime caregiver updates"
+      # (see docs/adr/0010-*.md). Removed here so the standing dev/demo
+      # backend is single-process (ActionCable works correctly); re-supply
+      # `WEB_CONCURRENCY=10` explicitly when re-running the k6 load gate
+      # (`ops/verify_m7.sh`) — tracked in docs/OPEN_DECISIONS.md.
+      RAILS_MAX_THREADS: "6"
+      # Dev-only VAPID keypair (M4 web push). Generated via raw
+      # OpenSSL::PKey::EC.generate("prime256v1") — see ADR-0006, the
+      # `webpush` gem's own key-generation helper is broken under
+      # OpenSSL 3.0. Not a production secret; regenerate before go-live.
+      VAPID_SUBJECT: "mailto:ops@example.eu"
+      VAPID_PUBLIC_KEY: "BOyTQtptL3RxsxpdGPi-vEmSQNDQzeb2saKutyOxsK_H-S511CkSuKqSTHdbV2HMKzQdK3rYMFkkPRnC7DrYwMo"
+      VAPID_PRIVATE_KEY: "oeCOu78wymzyGXH65z5do2Y8pW2-qk6cPEnj4mvk2B0"
+      # Real credential (ADR-0014) — read from the gitignored ops/.env via
+      # Compose's automatic variable substitution, never hardcoded here
+      # like the harmless self-generated VAPID keys above. See
+      # ops/.env.example for the template; ops/.env holds the real value.
+      ANTHROPIC_API_KEY: "${ANTHROPIC_API_KEY:-}"
+      ANTHROPIC_MODEL: "${ANTHROPIC_MODEL:-claude-sonnet-5}"
+      GEMINI_API_KEY: "${GEMINI_API_KEY:-}"
+      GEMINI_MODEL: "${GEMINI_MODEL:-gemini-2.5-flash}"
+      GEMINI_EMBEDDING_MODEL: "${GEMINI_EMBEDDING_MODEL:-gemini-embedding-001}"
+      # RAILS_ENV intentionally NOT set here: `rails_helper.rb` does
+      # `ENV['RAILS_ENV'] ||= 'test'`, which only takes effect if nothing
+      # has already set it. `bin/rails server` (below) and other one-off
+      # `docker compose run` invocations default to development on their
+      # own when RAILS_ENV is unset, so this stays correct for both without
+      # a mode-specific override.
+    volumes:
+      - ../backend:/app
+      - backend_bundle:/usr/local/bundle
+      # `rake ai:eval` writes docs/AI_EVAL_REPORT.md as a generated build
+      # artifact (Section 6) — needs host docs/ writable from the container.
+      - ../docs:/docs
+    ports:
+      - "3001:3000"  # 3000 is taken by another project's container on this host
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: ["bin/rails", "server", "-b", "0.0.0.0"]
+
+volumes:
+  postgres_data:
+  backend_bundle:

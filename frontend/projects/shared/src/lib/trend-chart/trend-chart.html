@@ -1,0 +1,20 @@
+@if (known().length > 0) {
+  <svg
+    class="trend-chart"
+    [attr.viewBox]="'0 0 ' + width() + ' ' + height()"
+    preserveAspectRatio="none"
+    role="img"
+    data-testid="trend-chart-svg"
+  >
+    <defs>
+      <linearGradient [attr.id]="gradientId" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="var(--evergreen)" stop-opacity="0.22" />
+        <stop offset="100%" stop-color="var(--evergreen)" stop-opacity="0" />
+      </linearGradient>
+    </defs>
+    <polygon class="trend-chart__area" [attr.points]="areaPoints()" [attr.fill]="'url(#' + gradientId + ')'" stroke="none" />
+    <polyline [attr.points]="polylinePoints()" />
+  </svg>
+} @else {
+  <p class="trend-chart__empty" data-testid="trend-chart-empty">{{ 'trendChart.noData' | translate }}</p>
+}

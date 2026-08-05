@@ -1,0 +1,229 @@
+.queue-shell {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6) var(--space-12);
+  font-family: var(--font-ui);
+  color: var(--ink);
+}
+
+.queue-shell h1 {
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+}
+
+.kpi-header {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: var(--space-3);
+  margin: var(--space-6) 0;
+}
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-4) var(--space-3);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--duration-fast) var(--ease-standard), box-shadow var(--duration-fast) var(--ease-standard);
+}
+
+.kpi:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.kpi-value {
+  font-size: 1.7rem;
+  font-weight: 700;
+  font-family: var(--font-display);
+  color: var(--evergreen-deep);
+  line-height: 1;
+}
+
+.kpi-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.kpi--red {
+  border-color: var(--coral);
+}
+
+.kpi--red .kpi-value {
+  color: var(--coral);
+}
+
+.kpi--yellow {
+  border-color: var(--amber);
+}
+
+.kpi--yellow .kpi-value {
+  color: var(--amber-deep);
+}
+
+.kpi--breach {
+  border-color: var(--coral);
+  background: var(--coral-soft);
+}
+
+.kpi--breach .kpi-value {
+  color: var(--coral-deep);
+}
+
+.kpi--ai-watch {
+  border-color: var(--ai);
+  background: var(--ai-soft);
+}
+
+.kpi--ai-watch .kpi-value {
+  color: var(--ai);
+}
+
+.filters {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+}
+
+.filters button {
+  padding: 0.45rem 1.05rem;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--card);
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--muted);
+  transition: background var(--duration-fast) var(--ease-standard), color var(--duration-fast) var(--ease-standard), border-color var(--duration-fast) var(--ease-standard);
+}
+
+.filters button:hover {
+  border-color: var(--evergreen);
+}
+
+.filters button.active {
+  background: var(--evergreen);
+  color: white;
+  border-color: var(--evergreen);
+}
+
+.queue-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.queue-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--line);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: var(--ink);
+  box-shadow: var(--shadow-sm);
+  transition: background var(--duration-fast) var(--ease-standard), transform var(--duration-fast) var(--ease-standard), box-shadow var(--duration-fast) var(--ease-standard);
+}
+
+.queue-row:hover {
+  background: var(--evergreen-soft);
+  transform: translateX(2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Severity-coded left rail — reinforces the icon+text badge already
+ * rendered by lib-severity-indicator; never the sole signal (Section 2). */
+.queue-row:has(.severity--red) {
+  border-left-color: var(--coral);
+}
+
+.queue-row:has(.severity--yellow) {
+  border-left-color: var(--amber);
+}
+
+.queue-row:has(.severity--green) {
+  border-left-color: var(--green);
+}
+
+.patient {
+  font-weight: 600;
+  flex: 1;
+}
+
+.state {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.sla {
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.25rem 0.7rem;
+  border-radius: var(--radius-pill);
+  background: var(--evergreen-soft);
+  color: var(--evergreen-deep);
+}
+
+.sla.breach {
+  color: #fff;
+  background: var(--coral);
+}
+
+.kpi--ai-watch .kpi-value {
+  color: var(--ai);
+}
+
+/* UC-23: AI WATCH is always AI-purple, never coral/amber, and reads as
+ * deliberately distinct from the rules-driven queue above — dashed rail,
+ * ✦ marker, no severity badge (there is none), no SLA/urgency chip. */
+.ai-watch-section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--ai);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: var(--space-8) 0 var(--space-3);
+}
+
+.ai-watch-row {
+  border-color: var(--ai);
+  border-left-style: dashed;
+  border-left-width: 3px;
+  background: var(--ai-soft);
+}
+
+.ai-watch-row:hover {
+  background: #e2ddf7;
+}
+
+.ai-watch-dot {
+  color: var(--ai);
+  font-weight: 700;
+  width: 1.4em;
+  height: 1.4em;
+  border-radius: 50%;
+  background: var(--card);
+  border: 1.5px solid var(--ai);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  flex: none;
+}

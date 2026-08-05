@@ -1,0 +1,10 @@
+<h1>Weekly pilot digest — <%= @site.name %></h1>
+<p>Period: <%= @metrics["from"] %> to <%= @metrics["to"] %></p>
+<ul>
+  <li>Check-in adherence rate: <%= @metrics["checkin_adherence_rate"] || "no data yet" %></li>
+  <li>RED-flag SLA compliance rate: <%= @metrics["red_flag_sla_compliance_rate"] || "no data yet" %></li>
+  <li>RED-flag median time-to-first-action (min): <%= @metrics["red_flag_median_time_to_first_action_minutes"] || "no data yet" %></li>
+  <li>Program completion rate (day-90 graduation): <%= @metrics["program_completion_rate"] || "no data yet" %></li>
+  <li>Assistant safety-routing rate: <%= @metrics["assistant_safety_routing_rate"] || "no data yet" %></li>
+</ul>
+<p style="color:#777777; font-size: 12px;">Aggregate, site-level counts only — no patient or caregiver identifiers.</p>

@@ -1,0 +1,164 @@
+.care-tasks-shell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6) var(--space-4) var(--space-12);
+  max-width: 480px;
+  margin: 0 auto;
+  font-family: var(--font-ui);
+  color: var(--ink);
+}
+
+.back-link {
+  color: var(--evergreen-deep);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  align-self: flex-start;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+h1 {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  margin: 0;
+}
+
+.empty {
+  color: var(--muted);
+  padding: var(--space-6) 0;
+  text-align: center;
+}
+
+.task-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.task-item {
+  background: var(--card);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--duration-fast) var(--ease-standard), background var(--duration-fast) var(--ease-standard);
+  animation: fade-up var(--duration-base) var(--ease-standard) both;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.task-item.taken {
+  border-color: var(--green);
+  background: var(--green-soft);
+}
+
+.task-item.missed {
+  border-color: var(--coral);
+  background: var(--coral-soft);
+}
+
+.task-title {
+  margin: 0 0 0.25rem;
+}
+
+.critical-badge {
+  display: inline-block;
+  color: var(--coral);
+  background: var(--coral-soft);
+  border-radius: var(--radius-pill);
+  padding: 0.1rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-left: 0.4rem;
+}
+
+.task-instructions {
+  margin: 0 0 0.25rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.task-status {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.task-item.taken .task-status {
+  color: var(--green-deep);
+}
+
+.task-item.missed .task-status {
+  color: var(--coral-deep);
+}
+
+.task-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.mark-taken,
+.mark-missed {
+  padding: 0.55rem 0.95rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: filter var(--duration-fast) var(--ease-standard), transform var(--duration-fast) var(--ease-standard);
+}
+
+.mark-taken {
+  background: var(--green);
+  color: white;
+}
+
+.mark-missed {
+  background: var(--coral);
+  color: white;
+}
+
+.mark-taken:hover:not(:disabled),
+.mark-missed:hover:not(:disabled) {
+  filter: brightness(0.92);
+}
+
+.mark-taken:active:not(:disabled),
+.mark-missed:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.mark-taken:disabled,
+.mark-missed:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.error {
+  color: var(--coral);
+  font-weight: 500;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .task-item {
+    animation: none;
+  }
+}

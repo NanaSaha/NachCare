@@ -1,0 +1,16 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "Unmaintained Dependency",
+      "warning_code": 122,
+      "fingerprint": "98b26f60d776fd41ee6f088c833725145be9aac2d7c5b33780241c273622db42",
+      "check_name": "EOLRails",
+      "message": "Support for Rails 7.2.3.2 ends on 2026-08-09",
+      "file": "Gemfile.lock",
+      "line": 216,
+      "confidence": "Medium",
+      "note": "Rails 7.2 is a locked stack decision (NachCareAI_Agent_Build_Instructions.md Section 2), not a code issue Brakeman can fix. Tracked as a human decision in docs/OPEN_DECISIONS.md rather than silently suppressed — revisit the Rails version before/around the EOL date."
+    }
+  ],
+  "updated_at": "2026-08-02 14:42:17 +0000"
+}

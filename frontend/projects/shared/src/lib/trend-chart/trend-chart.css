@@ -1,0 +1,19 @@
+.trend-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.trend-chart polyline {
+  fill: none;
+  stroke: var(--evergreen);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.trend-chart__empty {
+  color: var(--muted);
+  font-family: var(--font-ui);
+  text-align: center;
+}

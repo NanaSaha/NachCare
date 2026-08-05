@@ -1,0 +1,43 @@
+<main class="learn-shell" data-testid="learn-page">
+  <a routerLink="/home" class="back-link">{{ 'learn.back' | translate }}</a>
+  <h1>{{ 'learn.title' | translate }}</h1>
+
+  @if (loading()) {
+    <p>{{ 'learn.loading' | translate }}</p>
+  } @else {
+    <ul class="learn-list">
+      @for (item of items(); track item.id) {
+        <li
+          class="learn-item"
+          [class.locked]="!item.unlocked"
+          [class.completed]="item.completed"
+          [attr.data-testid]="'learn-item-' + item.id"
+          [attr.role]="item.unlocked ? 'button' : null"
+          [attr.tabindex]="item.unlocked ? 0 : null"
+          (click)="toggleOpen(item)"
+          (keydown.enter)="toggleOpen(item)"
+          (keydown.space)="toggleOpen(item)"
+        >
+          <div class="learn-item__header">
+            <span class="learn-item__title">{{ item.unlocked ? item.title : ('learn.lockedTitle' | translate: { week: item.week_no }) }}</span>
+            @if (item.completed) {
+              <span class="learn-item__badge" data-testid="learn-item-completed-badge">{{ 'learn.completed' | translate }}</span>
+            }
+          </div>
+
+          @if (item.unlocked && openItemId() === item.id) {
+            <p class="learn-item__body">{{ item.body }}</p>
+
+            @if (!item.completed) {
+              <button type="button" (click)="markComplete(item, $event)" [attr.data-testid]="'mark-complete-' + item.id">
+                {{ 'learn.markComplete' | translate }}
+              </button>
+            }
+          }
+        </li>
+      } @empty {
+        <li class="empty">{{ 'learn.empty' | translate }}</li>
+      }
+    </ul>
+  }
+</main>

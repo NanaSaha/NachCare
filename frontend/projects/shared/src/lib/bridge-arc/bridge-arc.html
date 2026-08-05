@@ -1,0 +1,63 @@
+<div
+  class="bridge-arc"
+  [class.bridge-arc--crossed]="crossed()"
+  role="img"
+  [attr.aria-label]="
+    (crossed() ? 'bridgeArc.crossedAria' : 'bridgeArc.dayAria')
+      | translate: { day: clampedDay(), total: totalDays() }
+  "
+  data-testid="bridge-arc"
+>
+  <svg class="bridge-arc__svg" viewBox="0 0 320 128" aria-hidden="true" focusable="false">
+    <!-- towers -->
+    <line x1="24" y1="108" x2="24" y2="124" class="bridge-arc__tower" />
+    <line x1="296" y1="108" x2="296" y2="124" class="bridge-arc__tower" />
+
+    <!-- track (full 90-day span, unfilled) -->
+    <path
+      class="bridge-arc__track"
+      d="M 24 108 Q 160 18 296 108"
+      pathLength="1"
+      fill="none"
+    />
+
+    <!-- progress (filled up to today) -->
+    <path
+      class="bridge-arc__progress"
+      d="M 24 108 Q 160 18 296 108"
+      pathLength="1"
+      fill="none"
+      [style.stroke-dashoffset]="dashOffset()"
+    />
+
+    <!-- Day 0 start marker -->
+    <circle cx="24" cy="108" r="4.5" class="bridge-arc__start" />
+
+    @if (crossed()) {
+      <!-- graduation flag at the far tower -->
+      <g class="bridge-arc__flag" [attr.transform]="'translate(296,108)'">
+        <line x1="0" y1="0" x2="0" y2="-22" class="bridge-arc__flagpole" />
+        <path d="M 0 -22 L 16 -17 L 0 -12 Z" class="bridge-arc__flagcloth" />
+      </g>
+    } @else {
+      <!-- traveller marker at today's position -->
+      <circle
+        [attr.cx]="markerPoint().x"
+        [attr.cy]="markerPoint().y"
+        r="6"
+        class="bridge-arc__marker"
+      />
+    }
+  </svg>
+
+  <div class="bridge-arc__caption">
+    @if (crossed()) {
+      <p class="bridge-arc__day" data-testid="bridge-arc-label">{{ 'bridgeArc.crossedLabel' | translate }}</p>
+    } @else {
+      <p class="bridge-arc__day" data-testid="bridge-arc-label">
+        {{ 'bridgeArc.dayLabel' | translate: { day: clampedDay(), total: totalDays() } }}
+      </p>
+    }
+    <p class="bridge-arc__caption-text">{{ (crossed() ? 'bridgeArc.crossedCaption' : 'bridgeArc.caption') | translate }}</p>
+  </div>
+</div>

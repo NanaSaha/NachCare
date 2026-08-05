@@ -1,0 +1,13 @@
+@if (auth.isAuthenticated()) {
+  <nav class="app-nav">
+    <span class="app-nav__brand">NachCare<span class="app-nav__brand-accent">AI</span></span>
+    <a routerLink="/triage" routerLinkActive="active">{{ 'nav.triage' | translate }}</a>
+    <a routerLink="/patients" routerLinkActive="active">{{ 'nav.patients' | translate }}</a>
+    <a routerLink="/enroll" routerLinkActive="active">{{ 'nav.enroll' | translate }}</a>
+    <a routerLink="/analytics" routerLinkActive="active">{{ 'nav.analytics' | translate }}</a>
+    <a routerLink="/risk-model" routerLinkActive="active">{{ 'nav.riskModel' | translate }}</a>
+    <app-nurse-alerts-bell class="nav-bell" />
+  </nav>
+}
+
+<router-outlet />

@@ -1,0 +1,11 @@
+# Local env overrides (see ops/.env.example for the template)
+ops/.env
+.env
+.env.local
+
+# OS cruft
+.DS_Store
+
+# Editors
+.vscode/*
+!.vscode/extensions.json

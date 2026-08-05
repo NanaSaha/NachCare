@@ -1,0 +1,173 @@
+.care-plan-shell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6) var(--space-4) var(--space-12);
+  max-width: 480px;
+  margin: 0 auto;
+  font-family: var(--font-ui);
+  color: var(--ink);
+}
+
+.back-link {
+  color: var(--evergreen-deep);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  align-self: flex-start;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+h1 {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  margin: 0;
+}
+
+.voice-button {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.7rem 1.4rem;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--evergreen);
+  color: white;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: background var(--duration-fast) var(--ease-standard), transform var(--duration-fast) var(--ease-standard);
+}
+
+.voice-button:hover:not(:disabled) {
+  background: var(--evergreen-deep);
+}
+
+.voice-button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.voice-button:disabled {
+  background: var(--line);
+  color: var(--muted);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.voice-unsupported {
+  color: var(--muted);
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+.empty {
+  color: var(--muted);
+  padding: var(--space-6) 0;
+  text-align: center;
+}
+
+.care-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+  animation: fade-up var(--duration-base) var(--ease-standard) both;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.care-card h2 {
+  margin: 0 0 var(--space-3);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--evergreen-deep);
+}
+
+.care-card p {
+  line-height: 1.55;
+}
+
+.care-card ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.care-card li {
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--paper);
+}
+
+.critical-badge {
+  display: inline-block;
+  color: var(--coral);
+  background: var(--coral-soft);
+  border-radius: var(--radius-pill);
+  padding: 0.1rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-left: 0.5rem;
+}
+
+.times {
+  display: block;
+  color: var(--evergreen-deep);
+  font-size: 0.9rem;
+  margin-top: 0.15rem;
+}
+
+.times.muted {
+  color: var(--muted);
+}
+
+.dose-instructions {
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.app-nav {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.app-nav a {
+  flex: 1;
+  text-align: center;
+  padding: 0.75em 0.5em;
+  border-radius: var(--radius-md);
+  background: var(--evergreen-soft);
+  color: var(--evergreen-deep);
+  border: 1px solid var(--line);
+  text-decoration: none;
+  font-weight: 500;
+  transition: background var(--duration-fast) var(--ease-standard), color var(--duration-fast) var(--ease-standard);
+}
+
+.app-nav a:hover {
+  background: var(--evergreen);
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .care-card {
+    animation: none;
+  }
+}

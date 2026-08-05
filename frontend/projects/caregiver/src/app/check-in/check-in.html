@@ -1,0 +1,343 @@
+<main class="checkin-shell">
+  @if (loading()) {
+    <div class="checkin-loading" data-testid="checkin-loading">
+      <div class="spinner" aria-hidden="true"></div>
+      <p>{{ 'checkin.loading' | translate }}</p>
+    </div>
+  } @else {
+    <header class="checkin-topbar">
+      <!-- Product-owner feedback item #2: top-left, not bottom-of-flow
+           (unlike onboarding.html's otherwise-identical .back pattern) —
+           the wizard now shares the screen with the persistent fixed
+           bottom nav (item #3), and a short step's content can end
+           entirely hidden behind it; top-left is also the conventional
+           mobile placement and needs no scrolling to reach on any step. -->
+      @if (stepIndex() > 0 && currentStep !== 'result') {
+        <button type="button" class="back" (click)="back()" data-testid="checkin-back">← {{ 'checkin.back' | translate }}</button>
+      } @else {
+        <span></span>
+      }
+
+      <!-- Caregiver requirement #1 (post-M7, ADR-0010): visible from the
+           moment the caregiver logs in, on every step, not just after
+           finishing today's check-in. -->
+      <a routerLink="/care-plan" class="care-plan-entry" data-testid="care-plan-entry">
+        {{ 'nav.carePlan' | translate }}
+      </a>
+    </header>
+
+    @if (programDay(); as day) {
+      <lib-bridge-arc class="home-bridge-arc" [currentDay]="day" [totalDays]="90" />
+    }
+
+    <!-- Large screens (see .checkin-columns in check-in.css): nurse tasks
+         sit in a left column beside the questionnaire on the right,
+         instead of stacking. On mobile this is unchanged — a normal
+         single-column flow, same DOM either way. -->
+    <div class="checkin-columns">
+      <div class="checkin-columns__nurse">
+        <!-- Product-owner feedback item #1: "alongside existing tasks — first:
+             tasks, medications and notes written by the nurse, with the time
+             attached; when caregiver clicks on each, the AI should give them
+             explanations." Shown first, on the landing step only (weight),
+             so it's the first thing seen on Home without cluttering every
+             step of the wizard that follows. -->
+        @if (stepIndex() === 0 && !loading()) {
+          <section class="nurse-tasks" data-testid="nurse-tasks-section">
+            <h2>{{ 'home.nurseTasksTitle' | translate }}</h2>
+
+            @if (home()!.medications.length === 0 && !home()?.care_instructions && !home()?.diet_rules) {
+              <p class="empty-note">{{ 'home.nurseTasksEmpty' | translate }}</p>
+            }
+
+            <ul class="nurse-task-list">
+              @for (med of home()!.medications; track med.id) {
+                <li>
+                  <button
+                    type="button"
+                    class="nurse-task-item"
+                    (click)="openExplain('medication', med.name, med.id)"
+                    [attr.data-testid]="'explain-medication-' + med.id"
+                  >
+                    <span class="nurse-task-item__label">{{ med.name }}</span>
+                    @if (med.schedule.times.length > 0) {
+                      <span class="nurse-task-item__time">{{ 'carePlan.at' | translate }} {{ med.schedule.times.join(', ') }}</span>
+                    }
+                    <span class="nurse-task-item__cta">{{ 'home.tapToExplain' | translate }}</span>
+                  </button>
+                </li>
+              }
+
+              @if (home()?.care_instructions; as instructions) {
+                <li>
+                  <button
+                    type="button"
+                    class="nurse-task-item"
+                    (click)="openExplainInstructions()"
+                    data-testid="explain-care-instructions"
+                  >
+                    <span class="nurse-task-item__label">{{ 'home.nurseTasksInstructions' | translate }}</span>
+                    <span class="nurse-task-item__note">{{ instructions }}</span>
+                    <span class="nurse-task-item__cta">{{ 'home.tapToExplain' | translate }}</span>
+                  </button>
+                </li>
+              }
+
+              @if (home()?.diet_rules; as diet) {
+                <li>
+                  <button
+                    type="button"
+                    class="nurse-task-item"
+                    (click)="openExplainDiet()"
+                    data-testid="explain-diet-rules"
+                  >
+                    <span class="nurse-task-item__label">{{ 'home.nurseTasksDiet' | translate }}</span>
+                    <span class="nurse-task-item__note">{{ diet }}</span>
+                    <span class="nurse-task-item__cta">{{ 'home.tapToExplain' | translate }}</span>
+                  </button>
+                </li>
+              }
+            </ul>
+          </section>
+        }
+      </div>
+
+      <div class="checkin-columns__wizard">
+        <div class="progress" role="progressbar" [attr.aria-valuenow]="stepIndex() + 1" aria-valuemin="1" [attr.aria-valuemax]="steps.length">
+          @for (step of steps; track step; let i = $index) {
+            <span class="dot" [class.active]="i === stepIndex()" [class.done]="i < stepIndex()"></span>
+          }
+        </div>
+
+        @switch (currentStep) {
+      @case ('weight') {
+        <section class="step-card">
+          <h1>{{ 'checkin.weight.title' | translate }}</h1>
+
+          @if (lastWeightKg() !== null) {
+            <p class="trend-chip">{{ 'checkin.weight.lastWeight' | translate }} {{ lastWeightKg() }} kg</p>
+          }
+
+          <input
+            type="number"
+            inputmode="decimal"
+            step="0.1"
+            class="weight-input"
+            [ngModel]="weight()"
+            (ngModelChange)="weight.set($event)"
+            data-testid="weight-input"
+          />
+
+          @if (showWeightConfirm()) {
+            <div class="confirm-dialog" role="alertdialog" data-testid="weight-confirm-dialog">
+              <p>{{ 'checkin.weight.confirmDelta' | translate }}</p>
+              <div class="confirm-dialog__actions">
+                <button type="button" class="btn btn--ghost" (click)="showWeightConfirm.set(false)">{{ 'checkin.weight.reenter' | translate }}</button>
+                <button type="button" class="btn btn--primary" (click)="confirmWeightAndNext()" data-testid="weight-confirm-yes">
+                  {{ 'checkin.weight.confirmYes' | translate }}
+                </button>
+              </div>
+            </div>
+          } @else {
+            <button type="button" class="btn btn--primary btn--block" [disabled]="weight() === null" (click)="confirmWeightAndNext()" data-testid="weight-next">
+              {{ 'onboarding.continue' | translate }}
+            </button>
+          }
+        </section>
+      }
+
+      @case ('medications') {
+        <section class="step-card">
+          <h1>{{ 'checkin.medications.title' | translate }}</h1>
+
+          @if (home()!.medications.length === 0) {
+            <p class="empty-note">{{ 'checkin.medications.none' | translate }}</p>
+          }
+
+          <div class="toggle-list">
+            @for (med of home()!.medications; track med.id) {
+              <label class="med-toggle" [class.med-toggle--off]="medStatus()[med.id] !== 'taken'">
+                <span>{{ med.name }}</span>
+                <input
+                  type="checkbox"
+                  class="switch"
+                  [checked]="medStatus()[med.id] === 'taken'"
+                  (change)="toggleMed(med.id)"
+                  [attr.data-testid]="'med-' + med.id"
+                />
+              </label>
+            }
+          </div>
+
+          <button type="button" class="btn btn--primary btn--block" (click)="next()" data-testid="medications-next">{{ 'onboarding.continue' | translate }}</button>
+        </section>
+      }
+
+      @case ('symptoms') {
+        <section class="step-card">
+          <h1>{{ 'checkin.symptoms.title' | translate }}</h1>
+
+          <div class="toggle-list">
+            <label class="symptom-toggle breathless" [class.symptom-toggle--on]="breathlessAtRest()">
+              <span>{{ 'checkin.symptoms.breathlessAtRest' | translate }}</span>
+              <input
+                type="checkbox"
+                class="switch switch--coral"
+                [checked]="breathlessAtRest()"
+                (change)="breathlessAtRest.set(!breathlessAtRest())"
+                data-testid="symptom-breathless-at-rest"
+              />
+            </label>
+
+            @for (key of otherSymptoms; track key) {
+              <label class="symptom-toggle" [class.symptom-toggle--on]="symptoms()[key]">
+                <span>{{ 'checkin.symptoms.' + key | translate }}</span>
+                <input
+                  type="checkbox"
+                  class="switch"
+                  [checked]="symptoms()[key]"
+                  (change)="toggleSymptom(key)"
+                  [attr.data-testid]="'symptom-' + key"
+                />
+              </label>
+            }
+          </div>
+
+          <button type="button" class="btn btn--primary btn--block" (click)="next()" data-testid="symptoms-next">{{ 'onboarding.continue' | translate }}</button>
+        </section>
+      }
+
+      @case ('note') {
+        <section class="step-card">
+          <h1>{{ 'checkin.note.title' | translate }}</h1>
+          <textarea
+            [ngModel]="note()"
+            (ngModelChange)="note.set($event)"
+            [placeholder]="'checkin.note.placeholder' | translate"
+            data-testid="note-textarea"
+          ></textarea>
+
+          <div class="photo-attach">
+            <label class="photo-attach-label">
+              {{ 'checkin.photo.title' | translate }}
+              <input
+                type="file"
+                accept="image/*,video/*"
+                capture="environment"
+                (change)="onPhotoSelected($event)"
+                data-testid="photo-input"
+              />
+            </label>
+
+            @if (photoPreviewUrl(); as preview) {
+              <div class="photo-preview" data-testid="photo-preview">
+                @if (photoFile()?.type?.startsWith('video/')) {
+                  <video [src]="preview" controls></video>
+                } @else {
+                  <img [src]="preview" alt="" />
+                }
+                <button type="button" class="btn btn--ghost" (click)="removePhoto()" data-testid="photo-remove">
+                  {{ 'checkin.photo.remove' | translate }}
+                </button>
+              </div>
+            }
+          </div>
+
+          @if (error()) {
+            <p class="error" role="alert">{{ error() | translate }}</p>
+          }
+
+          <button type="button" class="btn btn--primary btn--block" [disabled]="submitting()" (click)="submit()" data-testid="submit-checkin">
+            {{ (submitting() ? 'checkin.submitting' : 'checkin.submit') | translate }}
+          </button>
+        </section>
+      }
+
+      @case ('result') {
+        @if (resultSeverity(); as severity) {
+          <div class="result-card" [class]="'result-card--' + severity" data-testid="checkin-result">
+            <p class="result-card__eyebrow">{{ 'checkin.result.title' | translate }}</p>
+            <lib-severity-indicator [level]="severity" />
+
+            @if (severity !== 'green') {
+              <p class="notified-chip" [class]="'notified-chip--' + severity">
+                {{ 'checkin.result.notified.' + severity | translate }}
+              </p>
+            }
+
+            @if (resultBrief(); as brief) {
+              <p class="brief" data-testid="checkin-brief-ai">{{ brief.text }}</p>
+            } @else {
+              <p class="brief" data-testid="checkin-brief-template">{{ 'checkin.result.brief.' + severity | translate }}</p>
+            }
+
+            <!-- R4: renders identically regardless of AI/backend availability;
+                 given maximal visual weight — never styled like a normal
+                 button or blended into the rest of the card. -->
+            @if (severity === 'red') {
+              <lib-emergency-block />
+            }
+          </div>
+
+          <!-- UC-23 step 4: calm, non-alarming card — deliberately its own
+               distinct styling (never the amber/coral alert treatment) and
+               no SLA/urgency framing. -->
+          @if (aiWatchOpened()) {
+            <div class="ai-watch-card" data-testid="ai-watch-card">
+              <p class="ai-watch-card__badge">✦ {{ 'checkin.aiWatch.badge' | translate }}</p>
+              <p class="ai-watch-card__message">{{ 'checkin.aiWatch.message' | translate }}</p>
+              <p class="ai-watch-card__nothingWrong">{{ 'checkin.aiWatch.nothingWrong' | translate }}</p>
+              <p class="ai-watch-card__actionsTitle">{{ 'checkin.aiWatch.actionsTitle' | translate }}</p>
+              <ol class="ai-watch-card__actions">
+                <li>{{ 'checkin.aiWatch.action1' | translate }}</li>
+                <li>{{ 'checkin.aiWatch.action2' | translate }}</li>
+                <li>{{ 'checkin.aiWatch.action3' | translate }}</li>
+              </ol>
+            </div>
+          }
+        } @else {
+          <div class="result-card result-card--queued" data-testid="checkin-queued">
+            <p>{{ 'checkin.result.queued' | translate }}</p>
+          </div>
+        }
+
+        <section class="messages" data-testid="messages-panel">
+          <h2>{{ 'checkin.messages.title' | translate }}</h2>
+          <ul>
+            @for (m of messages(); track m.id) {
+              <li>{{ m.body_translated || m.body_source }}</li>
+            } @empty {
+              <li class="empty">{{ 'checkin.messages.empty' | translate }}</li>
+            }
+          </ul>
+        </section>
+
+        @if (home()?.caregiver?.assistant_available) {
+          <a class="assistant-entry" routerLink="/assistant" data-testid="assistant-entry">
+            {{ 'assistant.entry' | translate }}
+          </a>
+        }
+      }
+    }
+      </div>
+    </div>
+
+    @if (explainItem(); as item) {
+      <button type="button" class="explain-backdrop" (click)="closeExplain()" [attr.aria-label]="'home.closeExplain' | translate" data-testid="explain-backdrop"></button>
+      <div class="explain-panel" role="dialog" [attr.aria-label]="item.label" data-testid="explain-panel">
+        <button type="button" class="explain-panel__close" (click)="closeExplain()" data-testid="explain-close">✕</button>
+        <h3>{{ item.label }}</h3>
+
+        @if (explainLoading()) {
+          <p class="explain-panel__loading" data-testid="explain-loading">{{ 'home.explainLoading' | translate }}</p>
+        } @else if (explainError()) {
+          <p class="explain-panel__error" data-testid="explain-error">{{ 'home.explainError' | translate }}</p>
+        } @else if (explainResult(); as result) {
+          <p class="explain-panel__text" [class.explain-panel__text--ai]="result.source === 'ai'" data-testid="explain-text">
+            {{ result.text }}
+          </p>
+        }
+      </div>
+    }
+  }
+</main>

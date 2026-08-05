@@ -1,0 +1,307 @@
+.detail-shell {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6) var(--space-12);
+  font-family: var(--font-ui);
+  color: var(--ink);
+}
+
+.back-link {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 0.88rem;
+  padding: 0;
+  margin-bottom: var(--space-5);
+}
+
+.back-link:hover {
+  color: var(--evergreen-deep);
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.detail-header h1 {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+}
+
+section {
+  margin-bottom: var(--space-6);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+}
+
+section h2 {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 var(--space-4);
+}
+
+.sparkline {
+  width: 100%;
+  height: 90px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-3);
+}
+
+.checkin-history {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.checkin-history li {
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.checkin-history li:last-child {
+  border-bottom: none;
+}
+
+.checkin-note {
+  margin: var(--space-1) 0 0;
+  color: var(--ink);
+  font-style: italic;
+}
+
+.checkin-photos {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-top: var(--space-2);
+}
+
+.checkin-photo-thumb {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+}
+
+.evaluation-row,
+.intervention-row {
+  display: flex;
+  gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.evaluation-row:last-child,
+.intervention-row:last-child {
+  border-bottom: none;
+}
+
+.action-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.action-form label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.action-form input,
+.action-form textarea {
+  padding: var(--space-3);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-ui);
+  background: var(--paper);
+  transition: border-color var(--duration-fast) var(--ease-standard);
+}
+
+.action-form input:focus-visible,
+.action-form textarea:focus-visible {
+  border-color: var(--evergreen);
+}
+
+.action-buttons {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.action-buttons button {
+  padding: 0.7rem 1.1rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--evergreen);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-standard), transform var(--duration-fast) var(--ease-standard);
+}
+
+.action-buttons button:hover:not(:disabled) {
+  background: var(--evergreen-deep);
+}
+
+.action-buttons button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.action-buttons button:disabled {
+  background: var(--line);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+/* Third AI WATCH action ("dismiss false positive") reads as a calmer,
+ * secondary choice rather than a same-weight peer of the other two. */
+.action-buttons [data-testid='dismiss-false-positive'] {
+  background: none;
+  border: 1.5px solid var(--line);
+  color: var(--muted);
+}
+
+.action-buttons [data-testid='dismiss-false-positive']:hover:not(:disabled) {
+  border-color: var(--muted);
+  color: var(--ink);
+}
+
+/* AI-purple reserved exclusively for AI-generated content (Section 2) —
+ * distinctly AI-authored at a glance: solid tinted panel, purple border,
+ * ✦ marker baked into the heading, never just a color tint. */
+.copilot-panel {
+  border: 1.5px solid var(--ai);
+  background: var(--ai-soft);
+}
+
+.copilot-panel h2 {
+  color: var(--ai-deep);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 600;
+}
+
+.copilot-panel__draft {
+  white-space: pre-wrap;
+  margin: 0 0 var(--space-3);
+  line-height: 1.55;
+  background: var(--card);
+  border: 1px solid var(--ai);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+}
+
+.copilot-panel button,
+.conversation-turn__citation {
+  color: var(--ai-deep);
+}
+
+.copilot-panel button {
+  background: #fff;
+  border: 1.5px solid var(--ai);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-standard);
+}
+
+.copilot-panel button:hover {
+  background: var(--ai);
+  color: #fff;
+}
+
+.copilot-panel .empty {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.conversation-turns {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.conversation-turn {
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+}
+
+.conversation-turn--assistant {
+  border-color: var(--ai);
+  background: var(--ai-soft);
+}
+
+.conversation-turn__citation {
+  display: block;
+  font-size: 0.8rem;
+  margin-top: var(--space-1);
+}
+
+.badge {
+  display: inline-block;
+  margin-top: var(--space-2);
+  margin-right: var(--space-2);
+  padding: 0.2em 0.7em;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1px solid;
+}
+
+.badge--ai {
+  color: var(--ai-deep);
+  border-color: var(--ai);
+  background: #fff;
+}
+
+.badge--emergency {
+  color: var(--coral-deep);
+  border-color: var(--coral);
+  background: var(--coral-soft);
+}
+
+/* UC-23: AI WATCH is always AI-purple, never coral/amber (nothing is
+   confirmed wrong) — this is the one severity-indicator replacement in
+   the app, deliberately so it can never be mistaken for a rules-driven
+   yellow/red flag. Deliberately calm: no pulse, no countdown, no SLA
+   framing anywhere near it. */
+.ai-watch-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.4rem 0.9rem;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--ai);
+  background: var(--ai-soft);
+  color: var(--ai-deep);
+  font-weight: 700;
+  font-size: 0.88rem;
+}

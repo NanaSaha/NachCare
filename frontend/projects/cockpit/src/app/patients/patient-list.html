@@ -1,0 +1,27 @@
+<main class="list-shell">
+  <h1>{{ 'patients.title' | translate }}</h1>
+
+  @if (loading()) {
+    <p>{{ 'triage.loading' | translate }}</p>
+  } @else {
+    @if (showRiskColumn()) {
+      <button type="button" class="sort-toggle" (click)="toggleSort()" data-testid="sort-by-risk-trend">
+        {{ (sortByRisk() ? 'patients.sortDefault' : 'patients.sortByRiskTrend') | translate }}
+      </button>
+    }
+    <ul class="patient-list" data-testid="patient-list">
+      @for (patient of sortedPatients(); track patient.id) {
+        <li>
+          <a [routerLink]="['/patients', patient.id]" [attr.data-testid]="'patient-row-' + patient.id">
+            <span class="patient-name">{{ patient.pseudonym_code }} ({{ patient.initials }}) — NYHA {{ patient.nyha_class }}</span>
+            @if (patient.risk_trend) {
+              <span class="risk-trend" [class]="'risk-trend--' + patient.risk_trend" [attr.data-testid]="'risk-trend-' + patient.id">
+                {{ 'patients.riskTrend.' + patient.risk_trend | translate }}
+              </span>
+            }
+          </a>
+        </li>
+      }
+    </ul>
+  }
+</main>

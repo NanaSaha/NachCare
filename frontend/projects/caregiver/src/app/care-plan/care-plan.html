@@ -1,0 +1,63 @@
+<main class="care-plan-shell" data-testid="care-plan-page">
+  <a routerLink="/home" class="back-link">{{ 'carePlan.back' | translate }}</a>
+  <h1>{{ 'carePlan.title' | translate }}</h1>
+
+  @if (loading()) {
+    <p>{{ 'carePlan.loading' | translate }}</p>
+  } @else {
+    @if (voiceSupported) {
+      <button
+        type="button"
+        class="voice-button"
+        [disabled]="!hasContent()"
+        (click)="speaking() ? stop() : speak()"
+        data-testid="voice-play-button"
+      >
+        {{ (speaking() ? 'carePlan.voiceStop' : 'carePlan.voicePlay') | translate }}
+      </button>
+    } @else {
+      <p class="voice-unsupported" data-testid="voice-unsupported">{{ 'carePlan.voiceUnsupported' | translate }}</p>
+    }
+
+    @if (!hasContent()) {
+      <p class="empty" data-testid="care-plan-empty">{{ 'carePlan.empty' | translate }}</p>
+    }
+
+    @if (home()?.care_instructions; as instructions) {
+      <section class="care-card" data-testid="care-instructions-section">
+        <h2>{{ 'carePlan.instructionsTitle' | translate }}</h2>
+        <p>{{ instructions }}</p>
+      </section>
+    }
+
+    @if (home()?.diet_rules; as diet) {
+      <section class="care-card" data-testid="diet-rules-section">
+        <h2>{{ 'carePlan.dietTitle' | translate }}</h2>
+        <p>{{ diet }}</p>
+      </section>
+    }
+
+    @if ((home()?.medications ?? []).length > 0) {
+      <section class="care-card" data-testid="medications-section">
+        <h2>{{ 'carePlan.medicationsTitle' | translate }}</h2>
+        <ul>
+          @for (med of home()!.medications; track med.id) {
+            <li [attr.data-testid]="'care-plan-med-' + med.id">
+              <strong>{{ med.name }}</strong>
+              @if (med.critical) { <span class="critical-badge">{{ 'carePlan.critical' | translate }}</span> }
+              @if (med.schedule.times.length > 0) {
+                <span class="times">{{ 'carePlan.at' | translate }} {{ med.schedule.times.join(', ') }}</span>
+              } @else {
+                <span class="times muted">{{ 'carePlan.noSchedule' | translate }}</span>
+              }
+              @if (med.schedule.instructions) {
+                <p class="dose-instructions">{{ med.schedule.instructions }}</p>
+              }
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+  }
+</main>

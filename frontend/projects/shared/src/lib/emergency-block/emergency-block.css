@@ -1,0 +1,77 @@
+/*
+ * R4 / signature element #3: this block must be unmistakably different
+ * from a normal alert or button everywhere it renders (red result screen,
+ * Care-team page, emergency-detected assistant reply). Solid coral fill
+ * (not the usual soft-tint treatment used elsewhere), oversized tap
+ * target, icon + text (never color alone) — deliberately louder than
+ * anything else on the page it appears on.
+ */
+.emergency-block {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-5);
+  border-radius: var(--radius-lg);
+  background: var(--coral);
+  border: 2px solid var(--coral-deep);
+  box-shadow: var(--shadow-lg);
+  font-family: var(--font-ui);
+}
+
+.emergency-block__heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.emergency-block__icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #fff;
+  flex: none;
+}
+
+.emergency-block__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: #fff;
+}
+
+.emergency-block__call {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.9em 1.2em;
+  border-radius: var(--radius-md);
+  background: #fff;
+  color: var(--coral-deep);
+  font-weight: 700;
+  font-size: 1.3rem;
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--duration-fast) var(--ease-standard), box-shadow var(--duration-fast) var(--ease-standard);
+}
+
+.emergency-block__call:hover {
+  transform: scale(1.015);
+  box-shadow: var(--shadow-md);
+}
+
+.emergency-block__call:active {
+  transform: scale(0.98);
+}
+
+.emergency-block__call:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+.emergency-block__note {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #fff;
+  opacity: 0.92;
+}

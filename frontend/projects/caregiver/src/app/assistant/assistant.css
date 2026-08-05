@@ -1,0 +1,201 @@
+.assistant-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-4) var(--space-12);
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.assistant-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.assistant-header h1 {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  color: var(--evergreen-deep);
+  font-family: var(--font-ui);
+  font-weight: 600;
+  cursor: pointer;
+  padding: var(--space-2);
+}
+
+.back-button:hover {
+  text-decoration: underline;
+}
+
+.turns {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 200px;
+}
+
+.empty {
+  color: var(--muted);
+  text-align: center;
+  padding: var(--space-8) 0;
+}
+
+.turn {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  max-width: 85%;
+  line-height: 1.5;
+  animation: fade-up var(--duration-base) var(--ease-standard) both;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.turn--caregiver {
+  align-self: flex-end;
+  background: var(--evergreen-soft);
+  color: var(--evergreen-deep);
+  border-bottom-right-radius: var(--radius-sm);
+}
+
+/* AI-purple is reserved exclusively for AI-generated content (Section 2) —
+ * every assistant turn is AI output, so it must read as distinctly
+ * AI-authored at a glance, not just a color tint: purple border +
+ * background tint + a small ✦ marker are all present together. */
+.turn--assistant {
+  align-self: flex-start;
+  background: var(--ai-soft);
+  border: 1.5px solid var(--ai);
+  border-bottom-left-radius: var(--radius-sm);
+  position: relative;
+}
+
+.turn--assistant::before {
+  content: '✦';
+  position: absolute;
+  top: -0.6rem;
+  left: -0.4rem;
+  width: 1.4rem;
+  height: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ai);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 0.75rem;
+}
+
+.turn__content {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.turn__citation {
+  margin: var(--space-2) 0 0;
+  font-size: 0.8rem;
+  color: var(--ai-deep);
+}
+
+.turn__chip {
+  display: inline-block;
+  margin: var(--space-2) var(--space-2) 0 0;
+  padding: 0.25em 0.8em;
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: var(--ai-soft);
+  color: var(--ai-deep);
+  border: 1px solid var(--ai);
+}
+
+.turn__chip--emergency {
+  background: var(--coral-soft);
+  color: var(--coral-deep);
+  border-color: var(--coral);
+}
+
+.escalate-button {
+  margin-top: var(--space-2);
+  background: none;
+  border: 1.5px solid var(--ai);
+  color: var(--ai);
+  border-radius: var(--radius-pill);
+  padding: 0.35em 1em;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-standard), color var(--duration-fast) var(--ease-standard);
+}
+
+.escalate-button:hover:not(:disabled) {
+  background: var(--ai);
+  color: #fff;
+}
+
+.composer {
+  display: flex;
+  gap: var(--space-2);
+  position: sticky;
+  /* Sits above the fixed bottom tab bar (app/nav/bottom-nav.css), not
+     behind it — the same shared --bottom-nav-h reserve check-in.css's
+     explain panel and the "More" sheet use. A composer stuck behind an
+     opaque fixed nav is invisible and unusable, not just visually off;
+     caught by live browser testing (form submit silently not firing
+     since the click landed on the nav instead), not just a screenshot. */
+  bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + var(--space-2));
+  background: var(--paper);
+  padding-top: var(--space-2);
+}
+
+.composer input {
+  flex: 1;
+  padding: 0.8em 1em;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--line);
+  background: var(--card);
+  transition: border-color var(--duration-fast) var(--ease-standard);
+}
+
+.composer input:focus-visible {
+  border-color: var(--ai);
+}
+
+.composer button {
+  padding: 0.7em 1.4em;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--evergreen);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-standard);
+}
+
+.composer button:hover:not(:disabled) {
+  background: var(--evergreen-deep);
+}
+
+.composer button:disabled {
+  background: var(--line);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+.error {
+  color: var(--coral);
+  font-weight: 500;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .turn {
+    animation: none;
+  }
+}

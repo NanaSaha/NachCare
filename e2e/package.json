@@ -1,0 +1,14 @@
+{
+  "name": "e2e",
+  "version": "1.0.0",
+  "description": "Playwright e2e specs against the caregiver app, cockpit app, and Rails API (Section 2 stack decision).",
+  "private": true,
+  "scripts": {
+    "test": "playwright test"
+  },
+  "license": "UNLICENSED",
+  "type": "commonjs",
+  "devDependencies": {
+    "@playwright/test": "^1.62.1"
+  }
+}

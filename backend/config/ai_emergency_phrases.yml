@@ -1,0 +1,46 @@
+# PLACEHOLDER_CLINICAL — Domain::Ai::Guardrails::EmergencyDetector's
+# recall-oriented phrase list (Section 6 #4: "small LLM classification
+# call ... over the user message, 5 languages"). Deliberately separate
+# from config/rulesets/ruleset_v0_1.json's R-10 red_flag_phrases (check-in
+# free-text note matching, EN+DE only, falls back to EN for other
+# languages per its own spec/contract) — the assistant chat needs full
+# 5-language coverage and reusing R-10's file would have broken its
+# documented EN-fallback behavior for unlisted languages. Both lists are
+# the same *kind* of placeholder content (obviously-fake sentinels, not
+# real clinical phrasing) — tracked as one entry, see
+# docs/OPEN_CLINICAL_ITEMS.md #3.
+#
+# R4 reminder: this file only feeds the *chat's* "should I also show the
+# static 112 block" signal. The 112 block itself (frontend static markup)
+# is never gated by this list or by the AI gateway being up — it's not an
+# emergency-detection mechanism, it's a redundant safety net.
+en:
+  - "PLACEHOLDER_CLINICAL_EMERGENCY_PHRASE_EN_01"
+  - "PLACEHOLDER_CLINICAL_EMERGENCY_PHRASE_EN_02"
+  - "PLACEHOLDER_CLINICAL_EMERGENCY_PHRASE_EN_03"
+  - "PLACEHOLDER_CLINICAL_EMERGENCY_PHRASE_EN_04"
+  - "PLACEHOLDER_CLINICAL_EMERGENCY_PHRASE_EN_05"
+de:
+  - "PLACEHOLDER_CLINICAL_EMERGENCY_PHRASE_DE_01"
+  - "PLACEHOLDER_CLINICAL_EMERGENCY_PHRASE_DE_02"
+  - "PLACEHOLDER_CLINICAL_EMERGENCY_PHRASE_DE_03"
+  - "PLACEHOLDER_CLINICAL_EMERGENCY_PHRASE_DE_04"
+  - "PLACEHOLDER_CLINICAL_EMERGENCY_PHRASE_DE_05"
+tr:
+  - "PLACEHOLDER_CLINICAL_EMERGENCY_PHRASE_TR_01"
+  - "PLACEHOLDER_CLINICAL_EMERGENCY_PHRASE_TR_02"
+  - "PLACEHOLDER_CLINICAL_EMERGENCY_PHRASE_TR_03"
+  - "PLACEHOLDER_CLINICAL_EMERGENCY_PHRASE_TR_04"
+  - "PLACEHOLDER_CLINICAL_EMERGENCY_PHRASE_TR_05"
+ru:
+  - "PLACEHOLDER_CLINICAL_EMERGENCY_PHRASE_RU_01"
+  - "PLACEHOLDER_CLINICAL_EMERGENCY_PHRASE_RU_02"
+  - "PLACEHOLDER_CLINICAL_EMERGENCY_PHRASE_RU_03"
+  - "PLACEHOLDER_CLINICAL_EMERGENCY_PHRASE_RU_04"
+  - "PLACEHOLDER_CLINICAL_EMERGENCY_PHRASE_RU_05"
+ar:
+  - "PLACEHOLDER_CLINICAL_EMERGENCY_PHRASE_AR_01"
+  - "PLACEHOLDER_CLINICAL_EMERGENCY_PHRASE_AR_02"
+  - "PLACEHOLDER_CLINICAL_EMERGENCY_PHRASE_AR_03"
+  - "PLACEHOLDER_CLINICAL_EMERGENCY_PHRASE_AR_04"
+  - "PLACEHOLDER_CLINICAL_EMERGENCY_PHRASE_AR_05"

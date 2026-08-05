@@ -1,0 +1,80 @@
+<main class="care-team-shell" data-testid="care-team-page">
+  <a routerLink="/home" class="back-link">{{ 'careTeam.back' | translate }}</a>
+  <h1>{{ 'careTeam.title' | translate }}</h1>
+
+  <!-- R4: static markup, zero HTTP calls, functional even with every API/AI call down. -->
+  <lib-emergency-block />
+
+  <section class="site-info">
+    @if (siteName(); as name) {
+      <p data-testid="care-team-site-name">{{ name }}</p>
+    } @else if (siteInfoFailed()) {
+      <p class="muted">{{ 'careTeam.siteInfoUnavailable' | translate }}</p>
+    }
+    <p class="muted">{{ 'careTeam.messageHint' | translate }}</p>
+  </section>
+
+  <!-- Product-owner feedback item #3 (ADR-0011): status update to the care team, optional photo/video. -->
+  <section class="status-update" data-testid="status-update-composer">
+    <h2>{{ 'careTeam.update.title' | translate }}</h2>
+
+    <textarea
+      [ngModel]="updateText()"
+      (ngModelChange)="updateText.set($event)"
+      [placeholder]="'careTeam.update.placeholder' | translate"
+      data-testid="status-update-text"
+    ></textarea>
+
+    <label class="media-attach-label">
+      {{ 'careTeam.update.mediaLabel' | translate }}
+      <input type="file" accept="image/*,video/*" capture="environment" (change)="onMediaSelected($event)" data-testid="status-update-media-input" />
+    </label>
+
+    @if (updateMediaPreviewUrl(); as preview) {
+      <div class="media-preview" data-testid="status-update-media-preview">
+        @if (updateMedia()?.type?.startsWith('video/')) {
+          <video [src]="preview" controls></video>
+        } @else {
+          <img [src]="preview" alt="" />
+        }
+        <button type="button" (click)="removeMedia()" data-testid="status-update-media-remove">
+          {{ 'careTeam.update.removeMedia' | translate }}
+        </button>
+      </div>
+    }
+
+    @if (sendError()) {
+      <p class="error" role="alert">{{ sendError() | translate }}</p>
+    }
+
+    @if (sent()) {
+      <p class="success" data-testid="status-update-sent">{{ 'careTeam.update.sent' | translate }}</p>
+    }
+
+    <button
+      type="button"
+      [disabled]="sending() || (!updateText().trim() && !updateMedia())"
+      (click)="sendUpdate()"
+      data-testid="status-update-send"
+    >
+      {{ (sending() ? 'careTeam.update.sending' : 'careTeam.update.send') | translate }}
+    </button>
+  </section>
+
+  <section class="language-switcher" data-testid="language-switcher">
+    <h2>{{ 'careTeam.language.title' | translate }}</h2>
+    <div class="language-options">
+      @for (lang of languages; track lang) {
+        <button
+          type="button"
+          class="language-option"
+          [class.active]="currentLanguage() === lang"
+          (click)="selectLanguage(lang)"
+          [attr.data-testid]="'lang-switch-' + lang"
+        >
+          {{ 'languageNames.' + lang | translate }}
+        </button>
+      }
+    </div>
+  </section>
+</main>

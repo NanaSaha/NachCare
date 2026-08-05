@@ -1,0 +1,238 @@
+{
+  "severity": {
+    "green": "Alles gut",
+    "yellow": "Braucht Aufmerksamkeit",
+    "red": "Dringend"
+  },
+  "languageNames": {
+    "en": "English",
+    "de": "Deutsch",
+    "tr": "Türkçe",
+    "ru": "Русский",
+    "ar": "العربية"
+  },
+  "activation": {
+    "title": "NachCare AI aktivieren",
+    "intro": "Geben Sie den 8-stelligen Code vom Blatt Ihrer Pflegekraft ein.",
+    "codeLabel": "Aktivierungscode",
+    "activate": "Aktivieren",
+    "activating": "Wird aktiviert…",
+    "failed": "Dieser Code hat nicht funktioniert. Bitte prüfen und erneut versuchen, oder einen neuen Code anfordern."
+  },
+  "onboarding": {
+    "continue": "Weiter",
+    "back": "Zurück",
+    "finish": "Einrichtung abschließen",
+    "finishing": "Wird abgeschlossen…",
+    "failed": "Beim Speichern ist etwas schiefgelaufen. Bitte erneut versuchen.",
+    "language": {
+      "title": "Sprache wählen"
+    },
+    "consents": {
+      "title": "Bevor wir beginnen",
+      "a": "[PLACEHOLDER_CLINICAL: Einwilligungstext A — ausstehende Rechtsprüfung, docs/OPEN_DECISIONS.md #1]",
+      "b": "[PLACEHOLDER_CLINICAL: Einwilligungstext B — ausstehende Rechtsprüfung, docs/OPEN_DECISIONS.md #1]",
+      "c": "[PLACEHOLDER_CLINICAL: Einwilligungstext C — ausstehende Rechtsprüfung, docs/OPEN_DECISIONS.md #1]",
+      "d": "[PLACEHOLDER_CLINICAL: Einwilligungstext D — ausstehende Rechtsprüfung, docs/OPEN_DECISIONS.md #1]"
+    },
+    "notificationTime": {
+      "title": "Tägliche Erinnerung",
+      "intro": "Wann möchten Sie an den täglichen Check-in erinnert werden?"
+    },
+    "pin": {
+      "title": "4-stelligen PIN festlegen",
+      "intro": "Sperrt die App nach 15 Minuten Inaktivität."
+    },
+    "orientation": {
+      "title": "Kurze Einführung",
+      "videoPlaceholder": "[PLACEHOLDER: Einführungsvideo]"
+    }
+  },
+  "checkin": {
+    "loading": "Wird geladen…",
+    "weight": {
+      "title": "Gewicht heute",
+      "lastWeight": "Letzter Check-in:",
+      "confirmDelta": "Das ist eine große Veränderung seit dem letzten Check-in. Ist dieses Gewicht richtig?",
+      "reenter": "Erneut eingeben",
+      "confirmYes": "Ja, das stimmt"
+    },
+    "medications": {
+      "title": "Medikamente heute",
+      "none": "Noch keine Medikamente hinterlegt."
+    },
+    "symptoms": {
+      "title": "Wie fühlt sie sich heute?",
+      "breathlessAtRest": "Atemnot in Ruhe",
+      "swelling_increased": "[PLACEHOLDER_CLINICAL: Formulierung Ödem-/Schwellungsfrage]",
+      "fatigue_increased": "[PLACEHOLDER_CLINICAL: Formulierung Erschöpfungsfrage]"
+    },
+    "note": {
+      "title": "In Ihren eigenen Worten – wie fühlt sie sich heute?",
+      "placeholder": "Alles Weitere für das Pflegeteam, in Ihren eigenen Worten (optional)"
+    },
+    "photo": {
+      "title": "Foto oder Video hinzufügen (optional)",
+      "remove": "Entfernen"
+    },
+    "submit": "Check-in absenden",
+    "submitting": "Wird gesendet…",
+    "result": {
+      "title": "Ihr heutiges Ergebnis",
+      "brief": {
+        "green": "[PLACEHOLDER_CLINICAL: Grün-Ergebnistext]",
+        "yellow": "[PLACEHOLDER_CLINICAL: Gelb-Ergebnistext]",
+        "red": "[PLACEHOLDER_CLINICAL: Rot-Ergebnistext]"
+      },
+      "notified": {
+        "yellow": "Pflegeteam benachrichtigt",
+        "red": "Pflegeteam dringend benachrichtigt"
+      },
+      "queued": "Gerade keine Verbindung — dieser Check-in wird gesendet, sobald Sie wieder online sind."
+    },
+    "messages": {
+      "title": "Nachrichten von Ihrem Pflegeteam",
+      "empty": "Noch keine Nachrichten."
+    },
+    "aiWatch": {
+      "badge": "KI-Beobachtung",
+      "message": "Das Muster dieser Woche legt nahe, etwas genauer hinzuschauen.",
+      "nothingWrong": "Heute ist nichts falsch — Ihr Pflegeteam beobachtet nur etwas aufmerksamer.",
+      "actionsTitle": "Drei kleine Dinge für die nächsten 3 Tage:",
+      "action1": "Führen Sie Ihren täglichen Check-in wie gewohnt fort.",
+      "action2": "Nehmen Sie die Medikamente wie geplant ein.",
+      "action3": "Informieren Sie Ihr Pflegeteam, falls sich etwas ändert."
+    },
+    "back": "Zurück"
+  },
+  "home": {
+    "nurseTasksTitle": "Von Ihrer Pflegekraft",
+    "nurseTasksEmpty": "Noch nichts von Ihrer Pflegekraft.",
+    "nurseTasksInstructions": "Pflegeanweisungen zu Hause",
+    "nurseTasksDiet": "Ernährung",
+    "tapToExplain": "Tippen für eine Erklärung",
+    "explainLoading": "Erklärung wird geladen…",
+    "explainError": "Erklärung konnte gerade nicht geladen werden. Fragen Sie Ihre Pflegekraft, wenn Sie mehr wissen möchten.",
+    "closeExplain": "Erklärung schließen"
+  },
+  "bridgeArc": {
+    "dayLabel": "Tag {{day}} von {{total}}",
+    "crossedLabel": "Du hast die Brücke überquert",
+    "caption": "Ihre 90-tägige Genesungsreise",
+    "crossedCaption": "90 Tage, vollständig überquert",
+    "dayAria": "Fortschritt der Genesungsreise: Tag {{day}} von {{total}}",
+    "crossedAria": "Genesungsreise abgeschlossen — die Brücke ist vollständig überquert"
+  },
+  "emergencyBlock": {
+    "title": "Bei einem medizinischen Notfall",
+    "call": "112 anrufen",
+    "note": "Dies funktioniert immer, auch wenn die App oder der Assistent nicht verfügbar ist."
+  },
+  "assistant": {
+    "entry": "Assistent fragen",
+    "title": "Assistent",
+    "placeholder": "Ihre Frage eingeben…",
+    "send": "Senden",
+    "sending": "Wird gesendet…",
+    "unavailable": "Der Assistent ist derzeit nicht verfügbar.",
+    "empty": "Fragen Sie zum heutigen Check-in oder allgemeine Pflegefragen.",
+    "citedFrom": "Quelle:",
+    "routedChip": "✦ An Ihr Pflegeteam gesendet",
+    "emergencyNotice": "✦ Ihr Pflegeteam wurde ebenfalls benachrichtigt",
+    "escalate": "Stattdessen eine Pflegekraft fragen",
+    "escalating": "Wird gesendet…",
+    "escalated": "✓ An Ihre Pflegekraft gesendet",
+    "error": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
+  },
+  "nav": {
+    "home": "Start",
+    "carePlan": "Pflegeanweisungen",
+    "careTasks": "Heutige Aufgaben",
+    "trends": "Verlauf",
+    "learn": "Wissen",
+    "careTeam": "Pflegeteam",
+    "assistant": "Assistent",
+    "more": "Mehr",
+    "closeMore": "Menü schließen"
+  },
+  "trendChart": {
+    "noData": "Noch nicht genug Daten"
+  },
+  "trends": {
+    "back": "Zurück",
+    "title": "Ihr Verlauf",
+    "loading": "Wird geladen…",
+    "weight": {
+      "title": "Gewicht"
+    },
+    "symptoms": {
+      "title": "Erfasste Symptome"
+    },
+    "adherence": {
+      "title": "Medikamententreue"
+    }
+  },
+  "learn": {
+    "back": "Zurück",
+    "title": "Wissen",
+    "loading": "Wird geladen…",
+    "empty": "Hier gibt es noch nichts.",
+    "lockedTitle": "Freigeschaltet in Woche {{week}}",
+    "markComplete": "Als gelesen markieren",
+    "completed": "Erledigt"
+  },
+  "carePlan": {
+    "back": "Zurück",
+    "title": "Ihre Pflegeanweisungen",
+    "loading": "Wird geladen…",
+    "empty": "Ihre Pflegekraft hat noch keine Anweisungen hinzugefügt.",
+    "voicePlay": "🔊 Vorlesen",
+    "voiceStop": "⏹ Stopp",
+    "voiceUnsupported": "Sprachwiedergabe ist auf diesem Gerät nicht verfügbar.",
+    "instructionsTitle": "So pflegen Sie sie zuhause",
+    "dietTitle": "Ernährung",
+    "medicationsTitle": "Medikamente",
+    "critical": "kritisch",
+    "at": "um",
+    "noSchedule": "Noch kein Zeitplan festgelegt.",
+    "spokenIntro": "Ihre Pflegeanweisungen:",
+    "spokenDiet": "Ernährung:",
+    "spokenMedicationsIntro": "Medikamente:",
+    "spokenAt": "um",
+    "spokenNoTimes": "noch keine geplanten Zeiten"
+  },
+  "careTasks": {
+    "back": "Zurück",
+    "title": "Heutige Pflegeaufgaben",
+    "loading": "Wird geladen…",
+    "empty": "Heute sind keine Medikamentenzeiten geplant.",
+    "critical": "kritisch",
+    "markTaken": "Als eingenommen markieren",
+    "markMissed": "Als verpasst markieren",
+    "markFailed": "Konnte nicht gespeichert werden. Bitte erneut versuchen.",
+    "status": {
+      "pending": "Ausstehend",
+      "taken": "Eingenommen",
+      "missed": "Verpasst"
+    }
+  },
+  "careTeam": {
+    "back": "Zurück",
+    "title": "Pflegeteam",
+    "siteInfoUnavailable": "Details zum Pflegeteam sind gerade nicht verfügbar — die Notfalloptionen oben funktionieren weiterhin.",
+    "messageHint": "Nachrichten von Ihrem Pflegeteam erscheinen auch auf dem Check-in-Bildschirm.",
+    "language": {
+      "title": "App-Sprache"
+    },
+    "update": {
+      "title": "Update an Ihr Pflegeteam senden",
+      "placeholder": "Teilen Sie mit, wie es ihr geht, in Ihren eigenen Worten (optional, wenn Sie ein Foto oder Video anhängen)",
+      "mediaLabel": "Foto oder Video hinzufügen (optional)",
+      "removeMedia": "Entfernen",
+      "send": "Update senden",
+      "sending": "Wird gesendet…",
+      "sent": "Gesendet — Ihr Pflegeteam wird dies sehen.",
+      "sendFailed": "Konnte nicht gesendet werden. Bitte erneut versuchen."
+    }
+  }
+}

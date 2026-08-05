@@ -1,0 +1,11 @@
+/*
+ * Self-hosted fonts (Fraunces = display, Instrument Sans = UI), served from
+ * node_modules via @fontsource — no Google Fonts CDN at runtime (GDPR,
+ * Section 2). Weights: 400/600 for Fraunces (display), 400/500/600 for
+ * Instrument Sans (UI).
+ */
+@import "@fontsource/fraunces/400.css";
+@import "@fontsource/fraunces/600.css";
+@import "@fontsource/instrument-sans/400.css";
+@import "@fontsource/instrument-sans/500.css";
+@import "@fontsource/instrument-sans/600.css";

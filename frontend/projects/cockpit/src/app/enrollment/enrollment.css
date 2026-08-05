@@ -1,0 +1,221 @@
+.enroll-shell {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6) var(--space-12);
+  font-family: var(--font-ui);
+  color: var(--ink);
+}
+
+.enroll-shell h1 {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  margin-bottom: var(--space-5);
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+fieldset {
+  border: 1px solid var(--line);
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  box-shadow: var(--shadow-sm);
+}
+
+legend {
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--evergreen-deep);
+  padding: 0 var(--space-2);
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+input,
+select {
+  padding: 0.65rem 0.8rem;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  background: var(--paper);
+  color: var(--ink);
+  transition: border-color var(--duration-fast) var(--ease-standard);
+}
+
+input:focus-visible,
+select:focus-visible {
+  border-color: var(--evergreen);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--evergreen-soft);
+  color: var(--evergreen-deep);
+  border-radius: var(--radius-pill);
+  padding: 0.3rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.chip button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  color: inherit;
+}
+
+.matches {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm);
+  max-height: 180px;
+  overflow-y: auto;
+  background: var(--card);
+}
+
+.matches li button {
+  width: 100%;
+  text-align: left;
+  padding: 0.55rem 0.8rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  transition: background var(--duration-fast) var(--ease-standard);
+}
+
+.matches li button:hover {
+  background: var(--evergreen-soft);
+}
+
+button[type='submit'],
+.actions button:not(.secondary) {
+  padding: 0.75rem 1.15rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--evergreen);
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: background var(--duration-fast) var(--ease-standard);
+}
+
+button[type='submit']:hover:not(:disabled),
+.actions button:not(.secondary):hover {
+  background: var(--evergreen-deep);
+}
+
+button[type='submit']:disabled {
+  background: var(--line);
+  color: var(--muted);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.error {
+  color: var(--coral-deep);
+  background: var(--coral-soft);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.result {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-md);
+  text-align: center;
+  animation: reveal var(--duration-slow) var(--ease-standard) both;
+}
+
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.result h2 {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  margin: 0 0 var(--space-3);
+  color: var(--evergreen-deep);
+}
+
+.result .code {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-align: center;
+  background: var(--evergreen-soft);
+  color: var(--evergreen-deep);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  margin: var(--space-2) 0;
+}
+
+.expiry {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.actions .secondary {
+  background: var(--card);
+  border: 1.5px solid var(--line);
+  color: var(--ink);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1.15rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--ease-standard);
+}
+
+.actions .secondary:hover {
+  border-color: var(--evergreen);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .result {
+    animation: none;
+  }
+}

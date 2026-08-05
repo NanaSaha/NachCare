@@ -1,0 +1,54 @@
+<main class="care-tasks-shell" data-testid="care-tasks-page">
+  <a routerLink="/care-plan" class="back-link">{{ 'careTasks.back' | translate }}</a>
+  <h1>{{ 'careTasks.title' | translate }}</h1>
+
+  @if (loading()) {
+    <p>{{ 'careTasks.loading' | translate }}</p>
+  } @else if (tasks().length === 0) {
+    <p class="empty" data-testid="care-tasks-empty">{{ 'careTasks.empty' | translate }}</p>
+  } @else {
+    <ul class="task-list" data-testid="task-list">
+      @for (task of tasks(); track taskKey(task)) {
+        <li class="task-item" [class.taken]="task.status === 'taken'" [class.missed]="task.status === 'missed'" [attr.data-testid]="'task-' + taskKey(task)">
+          <div class="task-info">
+            <p class="task-title">
+              <strong>{{ task.scheduled_time }}</strong> — {{ task.medication_name }}
+              @if (task.critical) { <span class="critical-badge">{{ 'careTasks.critical' | translate }}</span> }
+            </p>
+            @if (task.instructions) {
+              <p class="task-instructions">{{ task.instructions }}</p>
+            }
+            <p class="task-status" [attr.data-testid]="'status-' + taskKey(task)">
+              {{ 'careTasks.status.' + task.status | translate }}
+            </p>
+          </div>
+
+          <div class="task-actions">
+            <button
+              type="button"
+              class="mark-taken"
+              [disabled]="marking() === taskKey(task)"
+              (click)="mark(task, 'taken')"
+              [attr.data-testid]="'mark-taken-' + taskKey(task)"
+            >
+              {{ 'careTasks.markTaken' | translate }}
+            </button>
+            <button
+              type="button"
+              class="mark-missed"
+              [disabled]="marking() === taskKey(task)"
+              (click)="mark(task, 'missed')"
+              [attr.data-testid]="'mark-missed-' + taskKey(task)"
+            >
+              {{ 'careTasks.markMissed' | translate }}
+            </button>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+
+  @if (error()) {
+    <p class="error" role="alert">{{ error() | translate }}</p>
+  }
+</main>

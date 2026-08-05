@@ -1,0 +1,32 @@
+# Deterministic keyword lists for Domain::Ai::Guardrails::KeywordPreRouter
+# (medication/dosage short-circuit, no LLM call needed — Section 6 #4) and
+# for Domain::Ai::Providers::StubProvider's rule-based classification.
+#
+# These are ordinary multilingual vocabulary (generic words like
+# "medication", "dose", "diagnosis", common prompt-injection phrasing) —
+# not clinical thresholds, alert copy, or dosing guidance, so this is an
+# engineering artifact per ADR-0007, not an OPEN_CLINICAL_ITEMS entry.
+# Non-English lists are machine-drafted for recall (favor catching too
+# much over missing a real medication question) and should be
+# native-reviewed before clinical launch — same caveat as OPEN_DECISIONS
+# #2 (DE translation review).
+medication_terms:
+  en: [ "medication", "medicine", "dose", "dosage", "milligram", "mg", "pill", "tablet", "prescription", "overdose", "should i take", "how much should i take", "skip a dose", "missed dose", "stop taking", "increase the dose", "decrease the dose", "diuretic", "furosemide", "ace inhibitor", "beta blocker" ]
+  de: [ "medikament", "medikamente", "dosis", "dosierung", "milligramm", "mg", "tablette", "rezept", "überdosis", "soll ich nehmen", "wie viel soll ich nehmen", "dosis auslassen", "dosis vergessen", "absetzen", "dosis erhöhen", "dosis verringern", "diuretikum", "betablocker" ]
+  tr: [ "ilaç", "ilaçlar", "doz", "dozaj", "miligram", "mg", "hap", "tablet", "reçete", "aşırı doz", "almalı mıyım", "ne kadar almalıyım", "dozu atlamak", "dozu unuttum", "kesmek" ]
+  ru: [ "лекарство", "лекарства", "доза", "дозировка", "миллиграмм", "мг", "таблетка", "рецепт", "передозировка", "стоит ли принимать", "сколько принимать", "пропустить дозу", "отменить" ]
+  ar: [ "دواء", "أدوية", "جرعة", "ملغ", "حبة", "قرص", "وصفة طبية", "جرعة زائدة", "هل يجب أن آخذ", "كم يجب أن آخذ", "تفويت الجرعة", "التوقف عن" ]
+
+diagnosis_terms:
+  en: [ "diagnosis", "diagnose", "prognosis", "what's wrong with", "do i have", "is this heart failure", "how long will", "how long do i have", "life expectancy" ]
+  de: [ "diagnose", "diagnostizieren", "prognose", "was stimmt nicht mit", "habe ich", "wie lange wird", "lebenserwartung" ]
+  tr: [ "teşhis", "tanı", "prognoz", "neyim var", "bende var mı", "ne kadar sürer", "yaşam beklentisi" ]
+  ru: [ "диагноз", "прогноз", "что со мной", "есть ли у меня", "сколько осталось", "продолжительность жизни" ]
+  ar: [ "تشخيص", "تكهن", "ما الخطأ", "هل لدي", "كم من الوقت", "متوسط العمر المتوقع" ]
+
+injection_phrases:
+  en: [ "ignore your instructions", "ignore previous instructions", "ignore all previous", "you are now", "act as", "pretend you are", "disregard your rules", "system prompt", "jailbreak", "new instructions", "forget your rules", "drgpt" ]
+  de: [ "ignoriere deine anweisungen", "ignoriere vorherige anweisungen", "du bist jetzt", "tu so als ob", "vergiss deine regeln", "neue anweisungen" ]
+  tr: [ "talimatlarını yok say", "önceki talimatları yok say", "artık sensin", "gibi davran", "kurallarını unut", "yeni talimatlar" ]
+  ru: [ "игнорируй свои инструкции", "игнорируй предыдущие инструкции", "теперь ты", "притворись", "забудь свои правила", "новые инструкции" ]
+  ar: [ "تجاهل تعليماتك", "تجاهل التعليمات السابقة", "أنت الآن", "تظاهر بأنك", "انس قواعدك", "تعليمات جديدة" ]

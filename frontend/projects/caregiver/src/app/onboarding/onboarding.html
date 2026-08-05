@@ -1,0 +1,86 @@
+<main class="onboarding-shell">
+  <div class="progress" role="progressbar" [attr.aria-valuenow]="stepIndex() + 1" aria-valuemin="1" [attr.aria-valuemax]="steps.length">
+    @for (step of steps; track step; let i = $index) {
+      <span class="dot" [class.active]="i === stepIndex()" [class.done]="i < stepIndex()"></span>
+    }
+  </div>
+
+  @switch (currentStep) {
+    @case ('language') {
+      <section class="step-card">
+        <h1>{{ 'onboarding.language.title' | translate }}</h1>
+        <div class="options">
+          @for (lang of [ 'en', 'de', 'tr', 'ru', 'ar' ]; track lang) {
+            <button type="button" class="option-btn" (click)="setLanguageAndAdvance(lang)" [attr.data-testid]="'lang-' + lang">
+              {{ 'languageNames.' + lang | translate }}
+            </button>
+          }
+        </div>
+      </section>
+    }
+
+    @case ('consents') {
+      <section class="step-card">
+        <h1>{{ 'onboarding.consents.title' | translate }}</h1>
+        <div class="consent-list">
+          @for (kind of consentKinds; track kind) {
+            <label class="consent">
+              <input type="checkbox" [checked]="consents()[kind]" (change)="toggleConsent(kind)" [attr.data-testid]="'consent-' + kind" />
+              <span>{{ 'onboarding.consents.' + kind | translate }}</span>
+            </label>
+          }
+        </div>
+        <button type="button" class="btn btn--primary btn--block" [disabled]="!allRequiredConsentsGranted" (click)="next()" data-testid="consents-next">
+          {{ 'onboarding.continue' | translate }}
+        </button>
+      </section>
+    }
+
+    @case ('notificationTime') {
+      <section class="step-card">
+        <h1>{{ 'onboarding.notificationTime.title' | translate }}</h1>
+        <p class="step-intro">{{ 'onboarding.notificationTime.intro' | translate }}</p>
+        <input type="time" class="big-input" [ngModel]="notificationTime()" (ngModelChange)="notificationTime.set($event)" data-testid="notification-time" />
+        <button type="button" class="btn btn--primary btn--block" (click)="next()" data-testid="notification-time-next">{{ 'onboarding.continue' | translate }}</button>
+      </section>
+    }
+
+    @case ('pin') {
+      <section class="step-card">
+        <h1>{{ 'onboarding.pin.title' | translate }}</h1>
+        <p class="step-intro">{{ 'onboarding.pin.intro' | translate }}</p>
+        <input
+          type="password"
+          inputmode="numeric"
+          maxlength="4"
+          class="big-input pin-input"
+          [ngModel]="pin()"
+          (ngModelChange)="pin.set($event)"
+          data-testid="pin-input"
+        />
+        <button type="button" class="btn btn--primary btn--block" [disabled]="pin().length !== 4" (click)="next()" data-testid="pin-next">
+          {{ 'onboarding.continue' | translate }}
+        </button>
+      </section>
+    }
+
+    @case ('orientation') {
+      <section class="step-card">
+        <h1>{{ 'onboarding.orientation.title' | translate }}</h1>
+        <div class="video-placeholder">{{ 'onboarding.orientation.videoPlaceholder' | translate }}</div>
+
+        @if (error()) {
+          <p class="error" role="alert">{{ error() | translate }}</p>
+        }
+
+        <button type="button" class="btn btn--primary btn--block" [disabled]="submitting()" (click)="finish()" data-testid="finish-onboarding">
+          {{ (submitting() ? 'onboarding.finishing' : 'onboarding.finish') | translate }}
+        </button>
+      </section>
+    }
+  }
+
+  @if (stepIndex() > 0) {
+    <button type="button" class="back" (click)="back()">← {{ 'onboarding.back' | translate }}</button>
+  }
+</main>

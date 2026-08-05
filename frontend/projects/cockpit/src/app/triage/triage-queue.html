@@ -1,0 +1,67 @@
+<main class="queue-shell">
+  <h1>{{ 'triage.title' | translate }}</h1>
+
+  @if (kpi(); as k) {
+    <div class="kpi-header" data-testid="kpi-header">
+      <div class="kpi"><span class="kpi-value">{{ k.open }}</span><span class="kpi-label">{{ 'triage.kpi.open' | translate }}</span></div>
+      <div class="kpi"><span class="kpi-value">{{ k.in_progress }}</span><span class="kpi-label">{{ 'triage.kpi.inProgress' | translate }}</span></div>
+      <div class="kpi kpi--red"><span class="kpi-value">{{ k.red }}</span><span class="kpi-label">{{ 'triage.kpi.red' | translate }}</span></div>
+      <div class="kpi kpi--yellow"><span class="kpi-value">{{ k.yellow }}</span><span class="kpi-label">{{ 'triage.kpi.yellow' | translate }}</span></div>
+      <div class="kpi kpi--ai-watch"><span class="kpi-value">{{ k.ai_watch }}</span><span class="kpi-label">{{ 'triage.kpi.aiWatch' | translate }}</span></div>
+      <div class="kpi kpi--breach"><span class="kpi-value">{{ k.breached }}</span><span class="kpi-label">{{ 'triage.kpi.breached' | translate }}</span></div>
+    </div>
+  }
+
+  <div class="filters">
+    <button type="button" [class.active]="!stateFilter()" (click)="setFilter(undefined)">{{ 'triage.filters.all' | translate }}</button>
+    <button type="button" [class.active]="stateFilter() === 'open'" (click)="setFilter('open')">{{ 'triage.filters.open' | translate }}</button>
+    <button type="button" [class.active]="stateFilter() === 'in_progress'" (click)="setFilter('in_progress')">{{ 'triage.filters.inProgress' | translate }}</button>
+    <button type="button" [class.active]="stateFilter() === 'resolved'" (click)="setFilter('resolved')">{{ 'triage.filters.resolved' | translate }}</button>
+  </div>
+
+  @if (loading()) {
+    <p>{{ 'triage.loading' | translate }}</p>
+  } @else if (flags().length === 0) {
+    <p>{{ 'triage.empty' | translate }}</p>
+  } @else {
+    <ul class="queue-list" data-testid="queue-list">
+      @for (flag of rulesFlags(); track flag.id) {
+        <li>
+          <a [routerLink]="['/triage', flag.id]" class="queue-row" [attr.data-testid]="'flag-row-' + flag.id">
+            <lib-severity-indicator [level]="asSeverity(flag.severity)" />
+            <span class="patient">{{ flag.patient.pseudonym_code }} ({{ flag.patient.initials }})</span>
+            <span class="state">{{ 'triage.state.' + flag.state | translate }}</span>
+            @if (flag.sla_deadline_at) {
+              <span class="sla" [class.breach]="flag.breach">
+                @if (flag.breach) {
+                  {{ 'triage.slaBreached' | translate }}
+                } @else {
+                  {{ slaMinutesRemaining(flag) }} {{ 'triage.slaMinutes' | translate }}
+                }
+              </span>
+            }
+          </a>
+        </li>
+      }
+    </ul>
+
+    <!-- UC-23 step 5: AI WATCH gets its own dedicated queue section below
+         reds/yellows — never mixed into the rules-driven list above. -->
+    @if (watchFlags().length > 0) {
+      <h2 class="ai-watch-section-title" data-testid="ai-watch-section-title">
+        ✦ {{ 'triage.aiWatch.sectionTitle' | translate }}
+      </h2>
+      <ul class="queue-list ai-watch-list" data-testid="ai-watch-list">
+        @for (flag of watchFlags(); track flag.id) {
+          <li>
+            <a [routerLink]="['/triage', flag.id]" class="queue-row ai-watch-row" [attr.data-testid]="'flag-row-' + flag.id">
+              <span class="ai-watch-dot">✦</span>
+              <span class="patient">{{ flag.patient.pseudonym_code }} ({{ flag.patient.initials }})</span>
+              <span class="state">{{ 'triage.state.' + flag.state | translate }}</span>
+            </a>
+          </li>
+        }
+      </ul>
+    }
+  }
+</main>

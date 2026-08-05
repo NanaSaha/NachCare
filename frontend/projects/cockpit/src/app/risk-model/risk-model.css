@@ -1,0 +1,160 @@
+.risk-model-shell {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-6) var(--space-12);
+  font-family: var(--font-ui);
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.risk-model-shell h1 {
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+}
+
+.disclaimer {
+  color: var(--muted);
+  font-size: 0.88rem;
+  margin-top: calc(-1 * var(--space-2));
+}
+
+.status-card {
+  margin: 0;
+}
+
+.promoted-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.45rem 1rem;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--ai);
+  background: var(--ai-soft);
+  color: var(--ai-deep);
+  font-weight: 700;
+}
+
+.shadow-badge {
+  display: inline-block;
+  padding: 0.45rem 1rem;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--line);
+  background: var(--card);
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.gates,
+.promote-form,
+.history {
+  border: 1px solid var(--line);
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+}
+
+.gates h2,
+.promote-form h2,
+.history h2 {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--evergreen-deep);
+  margin: 0 0 var(--space-3);
+}
+
+.insufficient-data {
+  color: var(--amber-deep);
+  background: var(--amber-soft);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+  font-weight: 500;
+  margin: 0 0 var(--space-3);
+}
+
+/* Gate pass/fail is color + icon + text, never color alone. */
+.gate-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--coral-deep);
+  font-weight: 500;
+}
+
+.gate-row:last-of-type {
+  border-bottom: none;
+}
+
+.gate-row::before {
+  content: '✕';
+  font-weight: 700;
+  margin-right: var(--space-2);
+}
+
+.gate-row.gate-met {
+  color: var(--green-deep);
+}
+
+.gate-row.gate-met::before {
+  content: '✓';
+}
+
+.overall {
+  font-weight: 700;
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1.5px solid var(--line);
+}
+
+.override-check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  color: var(--amber-deep);
+  font-weight: 500;
+}
+
+.promote-form button {
+  padding: 0.7rem 1.1rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--evergreen);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-standard);
+}
+
+.promote-form button:hover:not(:disabled) {
+  background: var(--evergreen-deep);
+}
+
+.promote-form button:disabled {
+  background: var(--line);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+.history ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.history li {
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.history li:last-child {
+  border-bottom: none;
+}

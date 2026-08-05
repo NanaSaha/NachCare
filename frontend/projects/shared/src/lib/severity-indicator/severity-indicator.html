@@ -1,0 +1,25 @@
+<span class="severity" [class]="'severity--' + level()" role="status">
+  @switch (level()) {
+    @case ('green') {
+      <svg class="severity__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+        <circle cx="10" cy="10" r="9" fill="var(--green-soft)" stroke="var(--green)" stroke-width="1.5" />
+        <path d="M6 10.5l2.5 2.5 5.5-6" fill="none" stroke="var(--green)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    }
+    @case ('yellow') {
+      <svg class="severity__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+        <path d="M10 2 18.5 17H1.5z" fill="var(--amber-soft)" stroke="var(--amber)" stroke-width="1.5" stroke-linejoin="round" />
+        <line x1="10" y1="8" x2="10" y2="12" stroke="var(--amber)" stroke-width="1.75" stroke-linecap="round" />
+        <circle cx="10" cy="14.5" r="0.9" fill="var(--amber)" />
+      </svg>
+    }
+    @case ('red') {
+      <svg class="severity__icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+        <circle cx="10" cy="10" r="9" fill="var(--coral-soft)" stroke="var(--coral)" stroke-width="1.5" />
+        <line x1="7" y1="7" x2="13" y2="13" stroke="var(--coral)" stroke-width="1.75" stroke-linecap="round" />
+        <line x1="13" y1="7" x2="7" y2="13" stroke="var(--coral)" stroke-width="1.75" stroke-linecap="round" />
+      </svg>
+    }
+  }
+  <span class="severity__text">{{ label() ?? ('severity.' + level() | translate) }}</span>
+</span>

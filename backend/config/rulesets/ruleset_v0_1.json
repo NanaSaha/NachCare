@@ -1,0 +1,154 @@
+{
+  "version": "0.1.0-placeholder",
+  "_readme": "PLACEHOLDER_CLINICAL throughout — SRS Section 6.2 (source of truth for R-1..R-11 thresholds) is not available in this repo. Rule structure/categories are a documented engineering decision (ADR-0005), not sourced from the SRS. Every threshold, phrase, and severity assignment here is a deliberately-absurd sentinel, not clinical guidance. Do not use for any real patient. See docs/OPEN_CLINICAL_ITEMS.md.",
+  "rules": [
+    {
+      "id": "R-1",
+      "key": "rapid_weight_gain",
+      "severity": "red",
+      "placeholder_clinical": true,
+      "clinical_note": "PLACEHOLDER_CLINICAL: threshold/window not sourced from SRS Section 6.2.",
+      "condition": { "type": "weight_gain_over_days", "days": 2, "threshold_kg": 999 },
+      "explanation_key": "escalation.explanation.r1",
+      "action_template_ids": [ "action.track_fluids_1_5l", "action.placeholder_call_nurse_now" ],
+      "brief_template_id": "brief.r1.red"
+    },
+    {
+      "id": "R-2",
+      "key": "gradual_weight_gain",
+      "severity": "yellow",
+      "placeholder_clinical": true,
+      "clinical_note": "PLACEHOLDER_CLINICAL: threshold/window not sourced from SRS Section 6.2.",
+      "condition": { "type": "weight_gain_over_days", "days": 7, "threshold_kg": 999 },
+      "explanation_key": "escalation.explanation.r2",
+      "action_template_ids": [ "action.low_salt_day", "action.track_fluids_1_5l" ],
+      "brief_template_id": "brief.r2.yellow"
+    },
+    {
+      "id": "R-3",
+      "key": "weight_loss",
+      "severity": "yellow",
+      "placeholder_clinical": true,
+      "clinical_note": "PLACEHOLDER_CLINICAL: threshold/window not sourced from SRS Section 6.2.",
+      "condition": { "type": "weight_loss_over_days", "days": 7, "threshold_kg": 999 },
+      "explanation_key": "escalation.explanation.r3",
+      "action_template_ids": [ "action.placeholder_hydration_check" ],
+      "brief_template_id": "brief.r3.yellow"
+    },
+    {
+      "id": "R-4",
+      "key": "breathless_at_rest",
+      "severity": "red",
+      "placeholder_clinical": true,
+      "clinical_note": "Topic (breathless-at-rest toggle) confirmed by playbook Section 8/M2; severity/copy are PLACEHOLDER_CLINICAL.",
+      "condition": { "type": "symptom_toggle", "symptom_key": "breathless_at_rest" },
+      "explanation_key": "escalation.explanation.r4",
+      "action_template_ids": [ "action.placeholder_emergency_guidance" ],
+      "brief_template_id": "brief.r4.red"
+    },
+    {
+      "id": "R-5",
+      "key": "increased_swelling",
+      "severity": "yellow",
+      "placeholder_clinical": true,
+      "clinical_note": "PLACEHOLDER_CLINICAL: not sourced from SRS Section 6.2.",
+      "condition": { "type": "symptom_toggle", "symptom_key": "swelling_increased" },
+      "explanation_key": "escalation.explanation.r5",
+      "action_template_ids": [ "action.elevate_legs_photo" ],
+      "brief_template_id": "brief.r5.yellow"
+    },
+    {
+      "id": "R-6",
+      "key": "symptom_combination",
+      "severity": "red",
+      "placeholder_clinical": true,
+      "clinical_note": "PLACEHOLDER_CLINICAL: which symptoms combine to red, and at what count, is not sourced from SRS Section 6.2.",
+      "condition": { "type": "symptom_combination", "symptom_keys": [ "swelling_increased", "fatigue_increased" ], "match": "all" },
+      "explanation_key": "escalation.explanation.r6",
+      "action_template_ids": [ "action.placeholder_call_nurse_now" ],
+      "brief_template_id": "brief.r6.red"
+    },
+    {
+      "id": "R-7",
+      "key": "medication_nonadherence",
+      "severity": "yellow",
+      "placeholder_clinical": true,
+      "clinical_note": "PLACEHOLDER_CLINICAL: which meds count as critical, and adherence window, is not sourced from SRS Section 6.2.",
+      "condition": { "type": "medication_nonadherence" },
+      "explanation_key": "escalation.explanation.r7",
+      "action_template_ids": [ "action.placeholder_medication_reminder" ],
+      "brief_template_id": "brief.r7.yellow"
+    },
+    {
+      "id": "R-8",
+      "key": "missed_checkin",
+      "severity": "yellow",
+      "placeholder_clinical": true,
+      "clinical_note": "Topic (missed-check-in nightly scan) confirmed by playbook Section 7/8; consecutive-day threshold is PLACEHOLDER_CLINICAL.",
+      "condition": { "type": "missed_checkin", "consecutive_days": 1 },
+      "explanation_key": "escalation.explanation.r8",
+      "action_template_ids": [ "action.placeholder_reminder_call" ],
+      "brief_template_id": "brief.r8.yellow"
+    },
+    {
+      "id": "R-9",
+      "key": "missing_weight",
+      "severity": "yellow",
+      "placeholder_clinical": true,
+      "clinical_note": "PLACEHOLDER_CLINICAL: not sourced from SRS Section 6.2 — engineering placeholder for a data-quality signal (check-in submitted but weight omitted repeatedly).",
+      "condition": { "type": "missing_weight", "consecutive_check_ins": 3 },
+      "explanation_key": "escalation.explanation.r9",
+      "action_template_ids": [ "action.placeholder_weigh_in_reminder" ],
+      "brief_template_id": "brief.r9.yellow"
+    },
+    {
+      "id": "R-10",
+      "key": "red_flag_phrases",
+      "severity": "red",
+      "placeholder_clinical": true,
+      "clinical_note": "Topic (free-text red-flag phrase matching) confirmed by playbook Section 7; the phrase lists below are explicitly PLACEHOLDER_CLINICAL sentinels, not real clinical phrasing.",
+      "condition": { "type": "red_flag_phrases" },
+      "explanation_key": "escalation.explanation.r10",
+      "action_template_ids": [ "action.placeholder_emergency_guidance" ],
+      "brief_template_id": "brief.r10.red"
+    },
+    {
+      "id": "R-11",
+      "key": "sustained_yellow_escalation",
+      "severity": "red",
+      "placeholder_clinical": true,
+      "clinical_note": "PLACEHOLDER_CLINICAL: not sourced from SRS Section 6.2 — engineering placeholder for a meta-escalation signal (repeated yellow evaluations).",
+      "condition": { "type": "sustained_severity", "severity": "yellow", "consecutive_evaluations": 3 },
+      "explanation_key": "escalation.explanation.r11",
+      "action_template_ids": [ "action.placeholder_call_nurse_now" ],
+      "brief_template_id": "brief.r11.red"
+    }
+  ],
+  "action_templates": {
+    "action.low_salt_day": { "en": "Low-salt day", "source": "playbook Section 7 (verbatim example)" },
+    "action.track_fluids_1_5l": { "en": "Track fluids: 1.5 L", "source": "playbook Section 7 (verbatim example)" },
+    "action.elevate_legs_photo": { "en": "Elevate legs + photo", "source": "playbook Section 7 (verbatim example)" },
+    "action.placeholder_call_nurse_now": { "en": "[PLACEHOLDER_CLINICAL: call-nurse-now copy]", "source": "placeholder" },
+    "action.placeholder_hydration_check": { "en": "[PLACEHOLDER_CLINICAL: hydration-check copy]", "source": "placeholder" },
+    "action.placeholder_emergency_guidance": { "en": "[PLACEHOLDER_CLINICAL: emergency guidance copy — note: the static 112 block per rule R4/Section 1 is separate and never gated by this]", "source": "placeholder" },
+    "action.placeholder_medication_reminder": { "en": "[PLACEHOLDER_CLINICAL: medication reminder copy]", "source": "placeholder" },
+    "action.placeholder_reminder_call": { "en": "[PLACEHOLDER_CLINICAL: reminder-call copy]", "source": "placeholder" },
+    "action.placeholder_weigh_in_reminder": { "en": "[PLACEHOLDER_CLINICAL: weigh-in reminder copy]", "source": "placeholder" }
+  },
+  "red_flag_phrases": {
+    "en": [
+      "PLACEHOLDER_CLINICAL_PHRASE_EN_01", "PLACEHOLDER_CLINICAL_PHRASE_EN_02", "PLACEHOLDER_CLINICAL_PHRASE_EN_03",
+      "PLACEHOLDER_CLINICAL_PHRASE_EN_04", "PLACEHOLDER_CLINICAL_PHRASE_EN_05", "PLACEHOLDER_CLINICAL_PHRASE_EN_06",
+      "PLACEHOLDER_CLINICAL_PHRASE_EN_07", "PLACEHOLDER_CLINICAL_PHRASE_EN_08", "PLACEHOLDER_CLINICAL_PHRASE_EN_09",
+      "PLACEHOLDER_CLINICAL_PHRASE_EN_10", "PLACEHOLDER_CLINICAL_PHRASE_EN_11", "PLACEHOLDER_CLINICAL_PHRASE_EN_12",
+      "PLACEHOLDER_CLINICAL_PHRASE_EN_13", "PLACEHOLDER_CLINICAL_PHRASE_EN_14", "PLACEHOLDER_CLINICAL_PHRASE_EN_15"
+    ],
+    "de": [
+      "PLACEHOLDER_CLINICAL_PHRASE_DE_01", "PLACEHOLDER_CLINICAL_PHRASE_DE_02", "PLACEHOLDER_CLINICAL_PHRASE_DE_03",
+      "PLACEHOLDER_CLINICAL_PHRASE_DE_04", "PLACEHOLDER_CLINICAL_PHRASE_DE_05", "PLACEHOLDER_CLINICAL_PHRASE_DE_06",
+      "PLACEHOLDER_CLINICAL_PHRASE_DE_07", "PLACEHOLDER_CLINICAL_PHRASE_DE_08", "PLACEHOLDER_CLINICAL_PHRASE_DE_09",
+      "PLACEHOLDER_CLINICAL_PHRASE_DE_10", "PLACEHOLDER_CLINICAL_PHRASE_DE_11", "PLACEHOLDER_CLINICAL_PHRASE_DE_12",
+      "PLACEHOLDER_CLINICAL_PHRASE_DE_13", "PLACEHOLDER_CLINICAL_PHRASE_DE_14", "PLACEHOLDER_CLINICAL_PHRASE_DE_15"
+    ]
+  }
+}
